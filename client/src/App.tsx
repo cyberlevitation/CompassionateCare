@@ -10,14 +10,34 @@ import Services from "@/pages/Services";
 import Contact from "@/pages/Contact";
 import PrivacyPolicy from "@/pages/PrivacyPolicy";
 import TermsConditions from "@/pages/TermsConditions";
+import Team from "@/pages/Team";
+import Blog from "@/pages/Blog";
+import Testimonials from "@/pages/Testimonials";
+import BookIntroduction from "@/pages/BookIntroduction";
+import DementiaCare from "@/pages/DementiaCare";
+import PalliativeCare from "@/pages/PalliativeCare";
+import LiveInCare from "@/pages/LiveInCare";
+import Gallery from "@/pages/Gallery";
+import RespiteCare from "@/pages/RespiteCare";
+import Recruitment from "@/pages/Recruitment";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
-      <Route path="/about" component={About} />
+      <Route path="/about-us" component={About} />
+      <Route path="/team" component={Team} />
       <Route path="/services" component={Services} />
-      <Route path="/contact" component={Contact} />
+      <Route path="/dementia-care" component={DementiaCare} />
+      <Route path="/palliative-care" component={PalliativeCare} />
+      <Route path="/live-in-care" component={LiveInCare} />
+      <Route path="/respite-care" component={RespiteCare} />
+      <Route path="/contact-us" component={Contact} />
+      <Route path="/book-an-introduction" component={BookIntroduction} />
+      <Route path="/blog" component={Blog} />
+      <Route path="/testimonials" component={Testimonials} />
+      <Route path="/gallery" component={Gallery} />
+      <Route path="/recruitment" component={Recruitment} />
       <Route path="/privacy-policy" component={PrivacyPolicy} />
       <Route path="/terms-conditions" component={TermsConditions} />
       <Route component={NotFound} />
