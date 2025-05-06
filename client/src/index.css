@@ -13,13 +13,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 40% 98%;
     
-    --primary: 213 70% 40%; /* #2071b5 - Super Health Care blue */
+    --primary: 357 93% 46%; /* #e30613 - Super Health Care red */
     --primary-foreground: 210 40% 98%;
     
-    --secondary: 138 54% 32%; /* #2a8942 - Super Health Care green */
+    --secondary: 0 0% 20%; /* #333333 - Super Health Care dark gray */
     --secondary-foreground: 210 40% 98%;
     
-    --accent: 22 90% 55%; /* #ef5223 - Super Health Care accent */
+    --accent: 357 93% 36%; /* #b50510 - Super Health Care darker red */
     --accent-foreground: 210 40% 98%;
 
     --muted: 210 40% 96.1%;
@@ -34,50 +34,50 @@
     
     --radius: 0.5rem;
 
-    --chart-1: 213 70% 40%;
-    --chart-2: 138 54% 32%;
-    --chart-3: 22 90% 55%;
-    --chart-4: 0 84.2% 60.2%;
-    --chart-5: 262.1 83.3% 57.8%;
+    --chart-1: 357 93% 46%;
+    --chart-2: 0 0% 20%;
+    --chart-3: 357 93% 36%;
+    --chart-4: 0 0% 40%;
+    --chart-5: 357 93% 60%;
 
-    --sidebar-background: 213 70% 40%;
+    --sidebar-background: 0 0% 20%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 213 70% 40%;
+    --sidebar-primary: 357 93% 46%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 213 70% 50%;
+    --sidebar-accent: 0 0% 30%;
     --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 213 70% 30%;
-    --sidebar-ring: 213 70% 50%;
+    --sidebar-border: 0 0% 15%;
+    --sidebar-ring: 357 93% 46%;
   }
  
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 0 0% 10%;
     --foreground: 210 40% 98%;
     
-    --card: 222.2 84% 4.9%;
+    --card: 0 0% 13%;
     --card-foreground: 210 40% 98%;
     
-    --popover: 222.2 84% 4.9%;
+    --popover: 0 0% 13%;
     --popover-foreground: 210 40% 98%;
     
-    --primary: 217.2 91.2% 59.8%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 357 93% 46%;
+    --primary-foreground: 0 0% 100%;
     
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 0 0% 25%;
     --secondary-foreground: 210 40% 98%;
     
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 215 20.2% 75%;
     
-    --accent: 217.2 32.6% 17.5%;
+    --accent: 357 93% 36%;
     --accent-foreground: 210 40% 98%;
     
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
     
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 224.3 76.3% 48%;
+    --border: 0 0% 25%;
+    --input: 0 0% 25%;
+    --ring: 357 93% 46%;
   }
 }
 

@@ -36,7 +36,7 @@ const Header = () => {
       <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
         <div className="flex items-center justify-between w-full md:w-auto">
           <Link href="/" onClick={closeMenu} className="flex items-center">
-            <img src="/logo.svg" alt="Super Health Care" className="h-12" />
+            <img src="/images/super-health-care-logo.png" alt="Super Health Care" className="h-14" />
           </Link>
           <Button 
             variant="ghost" 

@@ -10,7 +10,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
             <Link href="/">
-              <img src="/logo.svg" alt="Super Health Care" className="h-12 mb-4 bg-white rounded-md p-1" />
+              <img src="/images/super-health-care-logo.png" alt="Super Health Care" className="h-14 mb-4 bg-white rounded-md p-2" />
             </Link>
             <p className="mb-4 opacity-90">
               Providing exceptional home care services across the UK. Our dedicated team is committed to enhancing the quality of life for those we care for.
