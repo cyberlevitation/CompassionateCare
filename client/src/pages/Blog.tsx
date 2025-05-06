@@ -6,6 +6,7 @@ const Blog = () => {
     {
       id: 1,
       title: "The Benefits of Personalised Home Care",
+      slug: "benefits-of-personalised-home-care",
       excerpt: "Discover how personalised home care services can significantly improve quality of life and independence for individuals needing support.",
       date: "May 2, 2023",
       image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
@@ -14,6 +15,7 @@ const Blog = () => {
     {
       id: 2,
       title: "Understanding Dementia: A Guide for Families",
+      slug: "understanding-dementia-care",
       excerpt: "An informative guide for families navigating the challenges of caring for loved ones with dementia and memory-related conditions.",
       date: "April 15, 2023",
       image: "https://images.unsplash.com/photo-1559839734-2b71ea197ec2?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
@@ -22,6 +24,7 @@ const Blog = () => {
     {
       id: 3,
       title: "The Importance of Respite Care for Family Caregivers",
+      slug: "importance-of-respite-care",
       excerpt: "Learn why respite care is essential for the wellbeing of family caregivers and how it can prevent burnout while ensuring quality care continues.",
       date: "March 28, 2023",
       image: "https://images.unsplash.com/photo-1581578731548-c64695cc6952?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
@@ -30,6 +33,7 @@ const Blog = () => {
     {
       id: 4,
       title: "Nutrition Tips for Seniors: Maintaining a Healthy Diet",
+      slug: "nutrition-tips-for-seniors",
       excerpt: "Practical advice for ensuring seniors maintain a nutritious diet that supports their health and wellbeing as they age.",
       date: "March 10, 2023",
       image: "https://images.unsplash.com/photo-1498837167922-ddd27525d352?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
@@ -38,6 +42,7 @@ const Blog = () => {
     {
       id: 5,
       title: "Creating a Safe Home Environment for Elderly Individuals",
+      slug: "creating-safe-home-environment",
       excerpt: "Essential tips for adapting homes to make them safer and more accessible for elderly individuals with mobility or health challenges.",
       date: "February 22, 2023",
       image: "https://images.unsplash.com/photo-1568910748155-01ca989dbdd6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
@@ -46,6 +51,7 @@ const Blog = () => {
     {
       id: 6,
       title: "The Role of Technology in Modern Home Care",
+      slug: "technology-in-modern-home-care",
       excerpt: "Exploring how technology innovations are enhancing the delivery and quality of home care services for clients and caregivers alike.",
       date: "February 5, 2023",
       image: "https://images.unsplash.com/photo-1551811855-7d9b099f9e3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
@@ -96,7 +102,7 @@ const Blog = () => {
                 <p className="text-neutral-600 mb-4">
                   {post.excerpt}
                 </p>
-                <Link href={`/blog/${post.id}`} className="text-primary font-medium hover:underline">
+                <Link href={`/blog/${post.slug}`} className="text-primary font-medium hover:underline">
                   Read More →
                 </Link>
               </div>
