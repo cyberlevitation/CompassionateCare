@@ -9,7 +9,9 @@ const Footer = () => {
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
-            <h3 className="font-raleway font-bold text-xl mb-4">Super Health Care</h3>
+            <Link href="/">
+              <img src="/logo.svg" alt="Super Health Care" className="h-12 mb-4 bg-white rounded-md p-1" />
+            </Link>
             <p className="mb-4 opacity-90">
               Providing exceptional home care services across the UK. Our dedicated team is committed to enhancing the quality of life for those we care for.
             </p>
