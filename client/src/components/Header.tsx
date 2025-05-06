@@ -58,7 +58,7 @@ const Header = () => {
             Home
           </Link>
           <div className="relative group">
-            <button className={`font-raleway font-medium ${isActive('/about-us') || isActive('/team') ? 'text-primary border-b-2 border-primary' : 'text-neutral-700 hover:text-primary'} py-1 flex items-center`}>
+            <button className={`font-raleway font-medium ${isActive('/about') || isActive('/about-us') || isActive('/team') ? 'text-primary border-b-2 border-primary' : 'text-neutral-700 hover:text-primary'} py-1 flex items-center`}>
               About
               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -67,7 +67,7 @@ const Header = () => {
             <div className="absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block z-50">
               <div className="py-1">
                 <Link 
-                  href="/about-us" 
+                  href="/about" 
                   onClick={closeMenu}
                   className="block px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-100"
                 >
@@ -159,9 +159,9 @@ const Header = () => {
             Careers
           </Link>
           <Link 
-            href="/contact-us" 
+            href="/contact" 
             onClick={closeMenu}
-            className={`font-raleway font-medium ${isActive('/contact-us') ? 'text-primary border-b-2 border-primary' : 'text-neutral-700 hover:text-primary'} py-1`}
+            className={`font-raleway font-medium ${isActive('/contact') || isActive('/contact-us') ? 'text-primary border-b-2 border-primary' : 'text-neutral-700 hover:text-primary'} py-1`}
           >
             Contact
           </Link>

@@ -25,6 +25,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/about" component={About} />
       <Route path="/about-us" component={About} />
       <Route path="/team" component={Team} />
       <Route path="/services" component={Services} />
@@ -32,6 +33,7 @@ function Router() {
       <Route path="/palliative-care" component={PalliativeCare} />
       <Route path="/live-in-care" component={LiveInCare} />
       <Route path="/respite-care" component={RespiteCare} />
+      <Route path="/contact" component={Contact} />
       <Route path="/contact-us" component={Contact} />
       <Route path="/book-an-introduction" component={BookIntroduction} />
       <Route path="/blog" component={Blog} />
