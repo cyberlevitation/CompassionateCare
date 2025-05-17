@@ -36,7 +36,7 @@ const Header = () => {
       <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
         <div className="flex items-center justify-between w-full md:w-auto">
           <Link href="/" onClick={closeMenu} className="flex items-center">
-            <img src="/images/super-health-care-logo.png" alt="Super Health Care" className="h-14" />
+            <img src="/images/super-health-care-logo.svg" alt="Super Health Care" className="h-14" />
           </Link>
           <Button 
             variant="ghost" 
@@ -184,7 +184,7 @@ const Header = () => {
             >
               <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
             </svg>
-            01234 567 890
+            01702333120
           </a>
         </nav>
       </div>

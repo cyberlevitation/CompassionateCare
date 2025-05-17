@@ -265,8 +265,8 @@ const ContactSection = () => {
                     <h4 className="font-medium text-neutral-900 mb-1">Address</h4>
                     <p className="text-neutral-700">
                       Super Health Care Ltd.<br />
-                      123 Care Street<br />
-                      London, SW1A 1AA<br />
+                      201 Hamlet Court Road<br />
+                      Westcliff-on-Sea, Essex, SS0 7EL<br />
                       United Kingdom
                     </p>
                   </div>
@@ -279,7 +279,7 @@ const ContactSection = () => {
                   <div>
                     <h4 className="font-medium text-neutral-900 mb-1">Phone</h4>
                     <p className="text-neutral-700">
-                      <a href="tel:01234567890" className="hover:text-primary">01234 567 890</a><br />
+                      <a href="tel:01234567890" className="hover:text-primary">01702333120</a><br />
                       <span className="text-sm">Monday to Friday, 8am to 8pm</span>
                     </p>
                   </div>
