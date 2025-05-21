@@ -192,17 +192,36 @@ export default function ApplicationForm() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
+      // Format the data to match the database schema structure
+      const formattedData = {
+        personalDetails: data.personalDetails,
+        furtherInformation: data.furtherInformation,
+        nextOfKin: data.nextOfKin,
+        fitnessForWork: data.fitnessForWork,
+        disabilities: data.disabilities,
+        education: data.education,
+        employmentHistory: data.employmentHistory,
+        supportingStatement: data.supportingStatement,
+        equalityAct: data.equalityAct,
+        referees: data.referees,
+        termsAndConditions: data.termsAndConditions
+      };
+      
+      console.log("Submitting application form data:", formattedData);
+      
       const response = await fetch("/api/detailed-application", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(formattedData),
       });
       
+      const responseData = await response.json();
+      console.log("Server response:", responseData);
+      
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to submit application");
+        throw new Error(responseData.message || "Failed to submit application");
       }
       
       // Success! Show toast notification
