@@ -62,12 +62,6 @@ const ContactSection = () => {
       // Set success state for visual indicator
       setFormSubmitted(true);
       
-      // Scroll to top of form
-      const contactForm = document.getElementById('contact-form');
-      if (contactForm) {
-        contactForm.scrollIntoView({ behavior: 'smooth' });
-      }
-      
       // Reset form
       form.reset();
     },
@@ -116,6 +110,7 @@ const ContactSection = () => {
                     </div>
                   </div>
                 )}
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <FormField
                     control={form.control}

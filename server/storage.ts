@@ -11,7 +11,10 @@ import {
   type JobApplication,
   detailedApplications,
   type InsertDetailedApplication,
-  type DetailedApplication
+  type DetailedApplication,
+  users,
+  type User,
+  type UpsertUser
 } from "@shared/schema";
 import { eq, desc } from "drizzle-orm";
 
