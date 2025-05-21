@@ -85,6 +85,169 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update user preferences" });
     }
   });
+  
+  // Appointment API endpoints
+  
+  // Get all appointments for current user
+  app.get('/api/appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const appointments = await storage.getUserAppointments(userId);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching appointments:", error);
+      res.status(500).json({ message: "Failed to fetch appointments" });
+    }
+  });
+  
+  // Get upcoming appointments for current user
+  app.get('/api/appointments/upcoming', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const appointments = await storage.getUpcomingUserAppointments(userId);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching upcoming appointments:", error);
+      res.status(500).json({ message: "Failed to fetch upcoming appointments" });
+    }
+  });
+  
+  // Get specific appointment
+  app.get('/api/appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointmentId = parseInt(req.params.id);
+      const appointment = await storage.getAppointmentById(appointmentId);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // Ensure user can only access their own appointments
+      if (appointment.userId !== req.user.claims.sub) {
+        return res.status(403).json({ message: "Unauthorized access to appointment" });
+      }
+      
+      res.json(appointment);
+    } catch (error) {
+      console.error("Error fetching appointment:", error);
+      res.status(500).json({ message: "Failed to fetch appointment" });
+    }
+  });
+  
+  // Create new appointment
+  app.post('/api/appointments', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      
+      // Create appointment with user ID from authenticated session
+      const appointmentData = {
+        ...req.body,
+        userId,
+        status: 'scheduled'
+      };
+      
+      const newAppointment = await storage.createAppointment(appointmentData);
+      res.status(201).json(newAppointment);
+    } catch (error) {
+      console.error("Error creating appointment:", error);
+      res.status(500).json({ message: "Failed to create appointment" });
+    }
+  });
+  
+  // Update appointment
+  app.patch('/api/appointments/:id', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointmentId = parseInt(req.params.id);
+      const appointment = await storage.getAppointmentById(appointmentId);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // Ensure user can only update their own appointments
+      if (appointment.userId !== req.user.claims.sub) {
+        return res.status(403).json({ message: "Unauthorized access to appointment" });
+      }
+      
+      const updatedAppointment = await storage.updateAppointment(appointmentId, req.body);
+      res.json(updatedAppointment);
+    } catch (error) {
+      console.error("Error updating appointment:", error);
+      res.status(500).json({ message: "Failed to update appointment" });
+    }
+  });
+  
+  // Cancel appointment
+  app.post('/api/appointments/:id/cancel', isAuthenticated, async (req: any, res) => {
+    try {
+      const appointmentId = parseInt(req.params.id);
+      const appointment = await storage.getAppointmentById(appointmentId);
+      
+      if (!appointment) {
+        return res.status(404).json({ message: "Appointment not found" });
+      }
+      
+      // Ensure user can only cancel their own appointments
+      if (appointment.userId !== req.user.claims.sub) {
+        return res.status(403).json({ message: "Unauthorized access to appointment" });
+      }
+      
+      const canceledAppointment = await storage.cancelAppointment(appointmentId);
+      res.json(canceledAppointment);
+    } catch (error) {
+      console.error("Error canceling appointment:", error);
+      res.status(500).json({ message: "Failed to cancel appointment" });
+    }
+  });
+  
+  // Care Provider API endpoints
+  
+  // Get all active care providers
+  app.get('/api/care-providers', async (req, res) => {
+    try {
+      const providers = await storage.getAllActiveCareProviders();
+      res.json(providers);
+    } catch (error) {
+      console.error("Error fetching care providers:", error);
+      res.status(500).json({ message: "Failed to fetch care providers" });
+    }
+  });
+  
+  // Get specific care provider
+  app.get('/api/care-providers/:id', async (req, res) => {
+    try {
+      const providerId = parseInt(req.params.id);
+      const provider = await storage.getCareProviderById(providerId);
+      
+      if (!provider) {
+        return res.status(404).json({ message: "Care provider not found" });
+      }
+      
+      res.json(provider);
+    } catch (error) {
+      console.error("Error fetching care provider:", error);
+      res.status(500).json({ message: "Failed to fetch care provider" });
+    }
+  });
+  
+  // Get care provider availability
+  app.get('/api/care-providers/:id/availability', async (req, res) => {
+    try {
+      const providerId = parseInt(req.params.id);
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : new Date();
+      
+      // Default end date is 30 days from start date
+      const endDate = req.query.endDate ? 
+        new Date(req.query.endDate as string) : 
+        new Date(startDate.getTime() + (30 * 24 * 60 * 60 * 1000));
+      
+      const availability = await storage.getCareProviderAvailability(providerId, startDate, endDate);
+      res.json(availability);
+    } catch (error) {
+      console.error("Error fetching care provider availability:", error);
+      res.status(500).json({ message: "Failed to fetch care provider availability" });
+    }
+  });
   // Contact API endpoint
   app.post("/api/contact", async (req: Request, res: Response) => {
     try {

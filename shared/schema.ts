@@ -226,3 +226,52 @@ export const detailedApplicationSchema = createInsertSchema(detailedApplications
 
 export type InsertDetailedApplication = z.infer<typeof detailedApplicationSchema>;
 export type DetailedApplication = typeof detailedApplications.$inferSelect;
+
+// Appointments table
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(), // matches users.id which is varchar
+  appointmentType: varchar("appointment_type").notNull(),
+  date: timestamp("date").notNull(),
+  duration: integer("duration").notNull(), // in minutes
+  status: varchar("status").notNull().default("scheduled"),
+  notes: text("notes"),
+  careProviderId: integer("care_provider_id"),
+  location: varchar("location").notNull().default("client_home"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const appointmentSchema = createInsertSchema(appointments, {
+  appointmentType: (schema) => schema.min(2, "Appointment type is required"),
+  date: (schema) => schema,
+  duration: (schema) => schema.min(1, "Duration is required"),
+  notes: (schema) => schema.optional(),
+});
+
+export type InsertAppointment = z.infer<typeof appointmentSchema>;
+export type Appointment = typeof appointments.$inferSelect;
+
+// Care Providers table
+export const careProviders = pgTable("care_providers", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id"), // matches users.id which is varchar
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  title: varchar("title").notNull(),
+  specialization: varchar("specialization"),
+  bio: text("bio"),
+  imageUrl: varchar("image_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const careProviderSchema = createInsertSchema(careProviders, {
+  firstName: (schema) => schema.min(2, "First name is required"),
+  lastName: (schema) => schema.min(2, "Last name is required"),
+  title: (schema) => schema.min(2, "Title is required"),
+});
+
+export type InsertCareProvider = z.infer<typeof careProviderSchema>;
+export type CareProvider = typeof careProviders.$inferSelect;
