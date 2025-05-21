@@ -25,6 +25,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 const formSchema = z.object({
   fullName: z
@@ -58,7 +60,6 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const Recruitment = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
   const form = useForm<FormValues>({
@@ -80,33 +81,38 @@ const Recruitment = () => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log("Form data submitted:", data);
-
+  const { mutate, isPending: isSubmitting } = useMutation({
+    mutationFn: async (data: FormValues) => {
+      return await apiRequest('POST', '/api/job-application', data);
+    },
+    onSuccess: () => {
       toast({
         title: "Application Submitted",
         description:
           "We've received your application and will contact you shortly about the next steps.",
       });
-
       form.reset();
-    } catch (error) {
+    },
+    onError: (error) => {
+      console.error("Form submission error:", error);
       toast({
         title: "An error occurred",
         description:
           "Unable to submit your application. Please try again later.",
         variant: "destructive",
       });
-      console.error("Form submission error:", error);
-    } finally {
-      setIsSubmitting(false);
     }
+  });
+
+  const onSubmit = async (data: FormValues) => {
+    // Convert file to filename if needed (in a real app, you'd upload the file)
+    const submissionData = {
+      ...data,
+      cvFileName: data.cvFile?.name || undefined
+    };
+    
+    // Submit the form data to the API
+    mutate(submissionData);
   };
 
   const positions = [

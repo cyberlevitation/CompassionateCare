@@ -53,7 +53,7 @@ const BookIntroduction = () => {
 
   const { mutate, isPending: isSubmitting } = useMutation({
     mutationFn: async (data: FormValues) => {
-      return await apiRequest('/api/book-introduction', 'POST', data);
+      return await apiRequest('POST', '/api/book-introduction', data);
     },
     onSuccess: () => {
       toast({
