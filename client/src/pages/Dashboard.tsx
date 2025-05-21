@@ -3,10 +3,12 @@ import { useLocation } from "wouter";
 import { Helmet } from "react-helmet";
 import { useAuth } from "@/hooks/useAuth";
 import { PageTransition } from "@/lib/transitions";
+import { useQuery } from "@tanstack/react-query";
+import { format, addDays, parseISO } from "date-fns";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CalendarClock, FileText, Heart, Home, MessageSquare, Settings } from "lucide-react";
+import { CalendarClock, FileText, Heart, Home, MapPin, MessageSquare, Settings } from "lucide-react";
 
 export default function Dashboard() {
   const { user, isLoading, isAuthenticated } = useAuth();
@@ -74,9 +76,14 @@ export default function Dashboard() {
               <TabsContent value="overview" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card>
-                    <CardHeader>
-                      <CardTitle>Upcoming Appointments</CardTitle>
-                      <CardDescription>Your scheduled care visits</CardDescription>
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <div>
+                        <CardTitle>Upcoming Appointments</CardTitle>
+                        <CardDescription>Your scheduled care visits</CardDescription>
+                      </div>
+                      <Button onClick={() => setLocation("/book-appointment")} className="ml-auto" size="sm">
+                        Book New
+                      </Button>
                     </CardHeader>
                     <CardContent>
                       <div className="space-y-4">
@@ -84,12 +91,30 @@ export default function Dashboard() {
                           <div className="flex justify-between items-start">
                             <div>
                               <h4 className="font-medium">Care Assessment</h4>
-                              <p className="text-sm text-muted-foreground">Thursday, June 4, 2023 - 10:00 AM</p>
+                              <p className="text-sm text-muted-foreground">{format(addDays(new Date(), 3), "EEEE, MMMM d, yyyy")} - 10:00 AM</p>
+                              <div className="flex items-center gap-x-2 mt-1">
+                                <MapPin className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">Your Home</span>
+                              </div>
                             </div>
-                            <Button variant="outline" size="sm">Reschedule</Button>
+                            <div className="flex flex-col gap-2">
+                              <Button 
+                                variant="outline" 
+                                size="sm"
+                                onClick={() => setLocation("/appointments")}
+                              >
+                                Details
+                              </Button>
+                            </div>
                           </div>
                         </div>
-                        <Button variant="outline" className="w-full">View All Appointments</Button>
+                        <Button 
+                          variant="outline" 
+                          className="w-full"
+                          onClick={() => setLocation("/appointments")}
+                        >
+                          View All Appointments
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>
@@ -194,12 +219,51 @@ export default function Dashboard() {
 
               <TabsContent value="appointments">
                 <Card>
-                  <CardHeader>
-                    <CardTitle>Your Appointments</CardTitle>
-                    <CardDescription>Manage your care visits and schedules</CardDescription>
+                  <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <div>
+                      <CardTitle>Your Appointments</CardTitle>
+                      <CardDescription>Manage your care visits and schedules</CardDescription>
+                    </div>
+                    <Button onClick={() => setLocation("/appointments")} className="ml-auto">View All</Button>
                   </CardHeader>
                   <CardContent>
-                    <p>Your appointments will be shown here.</p>
+                    <div className="space-y-6">
+                      {/* Upcoming Appointments Preview */}
+                      <div className="space-y-4">
+                        {/* Sample appointment items - these will be replaced with real data */}
+                        {[0, 1].map((index) => (
+                          <div key={index} className="flex items-start rounded-lg border p-4">
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mr-4">
+                              <CalendarClock className="h-6 w-6 text-primary" />
+                            </div>
+                            <div className="flex-1 space-y-1">
+                              <div className="flex items-center justify-between">
+                                <p className="text-sm font-medium">{index === 0 ? "Initial Assessment" : "Regular Care Visit"}</p>
+                                <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Scheduled</span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">
+                                {index === 0 
+                                  ? format(addDays(new Date(), 3), "MMMM d, yyyy") + " at 10:00 AM" 
+                                  : format(addDays(new Date(), 7), "MMMM d, yyyy") + " at 2:00 PM"}
+                              </p>
+                              <div className="flex items-center gap-x-2 pt-1">
+                                <MapPin className="h-3 w-3 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">Your Home</span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                      
+                      <div className="flex flex-col gap-2">
+                        <Button onClick={() => setLocation("/book-appointment")} variant="default" className="w-full bg-primary hover:bg-primary/90">
+                          Book New Appointment
+                        </Button>
+                        <Button onClick={() => setLocation("/appointments")} variant="outline" className="w-full">
+                          Manage Your Appointments
+                        </Button>
+                      </div>
+                    </div>
                   </CardContent>
                 </Card>
               </TabsContent>

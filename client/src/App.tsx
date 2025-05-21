@@ -25,6 +25,8 @@ import ApplicationForm from "@/pages/ApplicationForm";
 import BlogDetail from "@/pages/BlogDetail";
 import Dashboard from "@/pages/Dashboard";
 import AccountSettings from "@/pages/AccountSettings";
+import BookAppointment from "@/pages/BookAppointment";
+import Appointments from "@/pages/Appointments";
 
 function Router() {
   const [location] = useLocation();
@@ -55,6 +57,8 @@ function Router() {
           <Route path="/terms-conditions" component={TermsConditions} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/account-settings" component={AccountSettings} />
+          <Route path="/book-appointment" component={BookAppointment} />
+          <Route path="/appointments" component={Appointments} />
           <Route component={NotFound} />
         </Switch>
       </PageTransition>
