@@ -30,6 +30,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch user" });
     }
   });
+  
+  // User profile update endpoint
+  app.patch('/api/user/profile', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const currentUser = await storage.getUser(userId);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Merge existing user data with updates
+      const updatedUserData = {
+        ...currentUser,
+        ...req.body,
+        id: userId, // Ensure ID doesn't change
+        updatedAt: new Date(),
+      };
+      
+      const updatedUser = await storage.updateUserProfile(userId, updatedUserData);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user profile:", error);
+      res.status(500).json({ message: "Failed to update user profile" });
+    }
+  });
+  
+  // User preferences update endpoint
+  app.patch('/api/user/preferences', isAuthenticated, async (req: any, res) => {
+    try {
+      const userId = req.user.claims.sub;
+      const currentUser = await storage.getUser(userId);
+      
+      if (!currentUser) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      
+      // Update preferences in user profile
+      const updatedUserData = {
+        ...currentUser,
+        preferences: {
+          ...(currentUser.preferences || {}),
+          ...req.body
+        },
+        id: userId, // Ensure ID doesn't change
+        updatedAt: new Date(),
+      };
+      
+      const updatedUser = await storage.updateUserProfile(userId, updatedUserData);
+      res.json(updatedUser);
+    } catch (error) {
+      console.error("Error updating user preferences:", error);
+      res.status(500).json({ message: "Failed to update user preferences" });
+    }
+  });
   // Contact API endpoint
   app.post("/api/contact", async (req: Request, res: Response) => {
     try {

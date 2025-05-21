@@ -39,6 +39,18 @@ export const storage = {
       .returning();
     return user;
   },
+  
+  async updateUserProfile(userId: string, userData: any): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set({
+        ...userData,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  },
 
   // Contacts
   async createContact(contact: InsertContact): Promise<Contact> {
