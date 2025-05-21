@@ -180,3 +180,151 @@ async function sendContactNotificationEmail(contact: InsertContact) {
     return false;
   }
 }
+
+async function sendBookingNotificationEmail(booking: InsertBooking) {
+  try {
+    // In a production environment, you would configure this with real SMTP credentials
+    // For now, we're just logging what would be sent
+    console.log(`
+      New booking introduction submission:
+      Name: ${booking.fullName}
+      Email: ${booking.email}
+      Phone: ${booking.phone}
+      Address: ${booking.address}
+      Postcode: ${booking.postcode}
+      Service Needed: ${booking.serviceNeeded}
+      Care Frequency: ${booking.careFrequency}
+      Start Date: ${booking.startDate}
+      Additional Info: ${booking.additionalInfo || 'None provided'}
+      Contact Preference: ${booking.contactPreference}
+      Heard About Us: ${booking.hearAboutUs || 'Not specified'}
+    `);
+    
+    // Example of how you would set up nodemailer in production
+    /*
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: '"Super Health Care" <no-reply@superhealthcare.co.uk>',
+      to: "bookings@superhealthcare.co.uk",
+      subject: "New Booking Introduction Request",
+      text: `
+        Name: ${booking.fullName}
+        Email: ${booking.email}
+        Phone: ${booking.phone}
+        Address: ${booking.address}
+        Postcode: ${booking.postcode}
+        Service Needed: ${booking.serviceNeeded}
+        Care Frequency: ${booking.careFrequency}
+        Start Date: ${booking.startDate}
+        Additional Info: ${booking.additionalInfo || 'None provided'}
+        Contact Preference: ${booking.contactPreference}
+        Heard About Us: ${booking.hearAboutUs || 'Not specified'}
+      `,
+      html: `
+        <h1>New Booking Introduction Request</h1>
+        <p><strong>Name:</strong> ${booking.fullName}</p>
+        <p><strong>Email:</strong> ${booking.email}</p>
+        <p><strong>Phone:</strong> ${booking.phone}</p>
+        <p><strong>Address:</strong> ${booking.address}</p>
+        <p><strong>Postcode:</strong> ${booking.postcode}</p>
+        <p><strong>Service Needed:</strong> ${booking.serviceNeeded}</p>
+        <p><strong>Care Frequency:</strong> ${booking.careFrequency}</p>
+        <p><strong>Start Date:</strong> ${booking.startDate}</p>
+        <p><strong>Additional Info:</strong> ${booking.additionalInfo || 'None provided'}</p>
+        <p><strong>Contact Preference:</strong> ${booking.contactPreference}</p>
+        <p><strong>Heard About Us:</strong> ${booking.hearAboutUs || 'Not specified'}</p>
+      `,
+    });
+    */
+    
+    return true;
+  } catch (error) {
+    console.error("Error sending booking notification email:", error);
+    return false;
+  }
+}
+
+async function sendJobApplicationNotificationEmail(application: InsertJobApplication) {
+  try {
+    // In a production environment, you would configure this with real SMTP credentials
+    // For now, we're just logging what would be sent
+    console.log(`
+      New job application submission:
+      Name: ${application.fullName}
+      Email: ${application.email}
+      Phone: ${application.phone}
+      Address: ${application.address}
+      Postcode: ${application.postcode}
+      Position: ${application.position}
+      Experience: ${application.experience}
+      Availability: ${application.availability}
+      Driver's License: ${application.driversLicense}
+      Right to Work: ${application.rightToWork}
+      Reference Contact Permission: ${application.referenceContact ? 'Yes' : 'No'}
+    `);
+    
+    // Example of how you would set up nodemailer in production
+    /*
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: '"Super Health Care" <no-reply@superhealthcare.co.uk>',
+      to: "recruitment@superhealthcare.co.uk",
+      subject: "New Job Application",
+      text: `
+        Name: ${application.fullName}
+        Email: ${application.email}
+        Phone: ${application.phone}
+        Address: ${application.address}
+        Postcode: ${application.postcode}
+        Position: ${application.position}
+        Experience: ${application.experience}
+        Availability: ${application.availability}
+        Driver's License: ${application.driversLicense}
+        Right to Work: ${application.rightToWork}
+        Cover Letter: ${application.coverLetter}
+        CV Filename: ${application.cvFileName || 'Not uploaded'}
+        Reference Contact Permission: ${application.referenceContact ? 'Yes' : 'No'}
+      `,
+      html: `
+        <h1>New Job Application</h1>
+        <p><strong>Name:</strong> ${application.fullName}</p>
+        <p><strong>Email:</strong> ${application.email}</p>
+        <p><strong>Phone:</strong> ${application.phone}</p>
+        <p><strong>Address:</strong> ${application.address}</p>
+        <p><strong>Postcode:</strong> ${application.postcode}</p>
+        <p><strong>Position:</strong> ${application.position}</p>
+        <p><strong>Experience:</strong> ${application.experience}</p>
+        <p><strong>Availability:</strong> ${application.availability}</p>
+        <p><strong>Driver's License:</strong> ${application.driversLicense}</p>
+        <p><strong>Right to Work:</strong> ${application.rightToWork}</p>
+        <p><strong>Cover Letter:</strong> ${application.coverLetter}</p>
+        <p><strong>CV Filename:</strong> ${application.cvFileName || 'Not uploaded'}</p>
+        <p><strong>Reference Contact Permission:</strong> ${application.referenceContact ? 'Yes' : 'No'}</p>
+      `,
+    });
+    */
+    
+    return true;
+  } catch (error) {
+    console.error("Error sending job application notification email:", error);
+    return false;
+  }
+}

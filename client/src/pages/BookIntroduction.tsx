@@ -10,23 +10,27 @@ import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 const formSchema = z.object({
   fullName: z.string().min(2, { message: "Full name must be at least 2 characters." }),
   email: z.string().email({ message: "Please enter a valid email address." }),
   phone: z.string().min(5, { message: "Please enter a valid phone number." }),
-  careType: z.string().min(1, { message: "Please select a care type." }),
-  location: z.string().min(2, { message: "Please enter a valid location." }),
-  preferredDate: z.string().min(1, { message: "Please select a preferred date." }),
-  preferredTime: z.string().min(1, { message: "Please select a preferred time." }),
-  message: z.string().optional(),
-  consent: z.boolean().refine((val) => val === true, { message: "You must agree to the privacy policy." }),
+  address: z.string().min(5, { message: "Please enter your address." }),
+  postcode: z.string().min(5, { message: "Please enter a valid postcode." }),
+  serviceNeeded: z.string().min(1, { message: "Please select a care type." }),
+  careFrequency: z.string().min(1, { message: "Please select care frequency." }),
+  startDate: z.string().min(1, { message: "Please select a start date." }),
+  contactPreference: z.string().min(1, { message: "Please select preferred contact method." }),
+  additionalInfo: z.string().optional(),
+  hearAboutUs: z.string().optional(),
+  dataConsent: z.boolean().refine((val) => val === true, { message: "You must agree to the privacy policy." }),
 });
 
 type FormValues = z.infer<typeof formSchema>;
 
 const BookIntroduction = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   
   const form = useForm<FormValues>({
@@ -35,40 +39,41 @@ const BookIntroduction = () => {
       fullName: "",
       email: "",
       phone: "",
-      careType: "",
-      location: "",
-      preferredDate: "",
-      preferredTime: "",
-      message: "",
-      consent: false,
+      address: "",
+      postcode: "",
+      serviceNeeded: "",
+      careFrequency: "",
+      startDate: "",
+      contactPreference: "phone",
+      additionalInfo: "",
+      hearAboutUs: "",
+      dataConsent: false,
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      console.log("Form data submitted:", data);
-      
+  const { mutate, isPending: isSubmitting } = useMutation({
+    mutationFn: async (data: FormValues) => {
+      return await apiRequest('/api/book-introduction', 'POST', data);
+    },
+    onSuccess: () => {
       toast({
         title: "Introduction Request Sent",
         description: "We've received your request and will contact you shortly to confirm your introduction meeting.",
       });
-      
       form.reset();
-    } catch (error) {
+    },
+    onError: (error) => {
+      console.error("Form submission error:", error);
       toast({
         title: "An error occurred",
         description: "Unable to submit your request. Please try again later.",
         variant: "destructive",
       });
-      console.error("Form submission error:", error);
-    } finally {
-      setIsSubmitting(false);
     }
+  });
+
+  const onSubmit = async (data: FormValues) => {
+    mutate(data);
   };
 
   return (
@@ -201,7 +206,7 @@ const BookIntroduction = () => {
                     
                     <FormField
                       control={form.control}
-                      name="careType"
+                      name="serviceNeeded"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Type of Care Needed</FormLabel>
@@ -226,29 +231,15 @@ const BookIntroduction = () => {
                     />
                   </div>
                   
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Location (Town/City)</FormLabel>
-                        <FormControl>
-                          <Input placeholder="London" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="preferredDate"
+                      name="address"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Preferred Date</FormLabel>
+                          <FormLabel>Address</FormLabel>
                           <FormControl>
-                            <Input type="date" {...field} />
+                            <Input placeholder="123 Main Street" {...field} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -257,20 +248,102 @@ const BookIntroduction = () => {
                     
                     <FormField
                       control={form.control}
-                      name="preferredTime"
+                      name="postcode"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Preferred Time</FormLabel>
+                          <FormLabel>Postcode</FormLabel>
+                          <FormControl>
+                            <Input placeholder="SW1A 1AA" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="careFrequency"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Care Frequency</FormLabel>
                           <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                               <SelectTrigger>
-                                <SelectValue placeholder="Select time" />
+                                <SelectValue placeholder="Select frequency" />
                               </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                              <SelectItem value="morning">Morning (9AM - 12PM)</SelectItem>
-                              <SelectItem value="afternoon">Afternoon (12PM - 5PM)</SelectItem>
-                              <SelectItem value="evening">Evening (5PM - 7PM)</SelectItem>
+                              <SelectItem value="daily">Daily</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="24/7">24/7 Live-in</SelectItem>
+                              <SelectItem value="one-time">One-time Visit</SelectItem>
+                              <SelectItem value="not-sure">Not Sure Yet</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="startDate"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Start Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="contactPreference"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Preferred Contact Method</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select contact method" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="phone">Phone</SelectItem>
+                              <SelectItem value="email">Email</SelectItem>
+                              <SelectItem value="both">Both Phone & Email</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="hearAboutUs"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>How did you hear about us?</FormLabel>
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select an option" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              <SelectItem value="search">Search Engine</SelectItem>
+                              <SelectItem value="social">Social Media</SelectItem>
+                              <SelectItem value="referral">Friend/Family Recommendation</SelectItem>
+                              <SelectItem value="professional">Professional Referral</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
                             </SelectContent>
                           </Select>
                           <FormMessage />
@@ -281,7 +354,7 @@ const BookIntroduction = () => {
                   
                   <FormField
                     control={form.control}
-                    name="message"
+                    name="additionalInfo"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Additional Information (Optional)</FormLabel>
@@ -298,7 +371,7 @@ const BookIntroduction = () => {
                   
                   <FormField
                     control={form.control}
-                    name="consent"
+                    name="dataConsent"
                     render={({ field }) => (
                       <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                         <FormControl>
