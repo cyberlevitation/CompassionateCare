@@ -356,6 +356,35 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Detailed application form endpoint
+  app.post("/api/detailed-application", async (req: Request, res: Response) => {
+    try {
+      console.log("Detailed application received");
+      
+      // Store application in database
+      const detailedApplication = await storage.createDetailedApplication(req.body);
+      
+      // Log notification for debugging
+      console.log(`
+        New detailed application form submission:
+        ID: ${detailedApplication.id}
+        Submitted: ${new Date().toISOString()}
+      `);
+      
+      return res.status(201).json({
+        success: true,
+        message: "Detailed application submitted successfully",
+        data: detailedApplication
+      });
+    } catch (error) {
+      console.error("Error processing detailed application form:", error);
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing your detailed application"
+      });
+    }
+  });
+  
   const httpServer = createServer(app);
   return httpServer;
 }

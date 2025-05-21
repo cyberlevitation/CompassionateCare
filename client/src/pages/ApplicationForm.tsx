@@ -102,6 +102,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function ApplicationForm() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -191,29 +192,35 @@ export default function ApplicationForm() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      await fetch("/api/application", {
+      const response = await fetch("/api/detailed-application", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-      }).then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to submit application");
-        }
-        return res.json();
       });
       
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to submit application");
+      }
+      
+      // Success! Show toast notification
       toast({
-        title: "Application submitted",
-        description: "Thank you for your application. We will be in touch shortly.",
+        title: "Application submitted successfully",
+        description: "Thank you for your application. Our recruitment team will review your details and contact you shortly.",
       });
+      
+      // Scroll to top of the page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Reset form
       form.reset();
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({
-        title: "Error",
-        description: "There was an error submitting your application. Please try again.",
+        title: "Application Submission Failed",
+        description: error instanceof Error ? error.message : "There was an error submitting your application. Please try again.",
         variant: "destructive",
       });
     } finally {
