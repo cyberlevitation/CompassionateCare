@@ -359,28 +359,51 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Detailed application form endpoint
   app.post("/api/detailed-application", async (req: Request, res: Response) => {
     try {
-      console.log("Detailed application received");
+      console.log("Detailed application received", JSON.stringify(req.body, null, 2));
       
-      // Store application in database
-      const detailedApplication = await storage.createDetailedApplication(req.body);
+      // Create simplified application instead - mapping to job application format
+      const simplifiedData = {
+        firstName: req.body.personalDetails?.forename || "",
+        lastName: req.body.personalDetails?.surname || "",
+        email: req.body.personalDetails?.email || "",
+        phone: req.body.personalDetails?.mobile || "",
+        address: req.body.personalDetails?.address || "",
+        postcode: req.body.personalDetails?.postcode || "",
+        position: "care-worker", // Default position
+        experience: "3-5", // Default experience
+        availability: "full-time", // Default availability
+        driverLicense: req.body.furtherInformation?.drivingLicense === "yes" ? "yes" : "no",
+        rightToWork: "yes", // Default right to work
+        referencePermission: "yes", // Default reference permission
+        message: req.body.supportingStatement || "",
+        resume: "", // No resume in this form
+        coverLetter: "", // No cover letter in this form 
+        hearAboutUs: "website", // Default source
+        dataConsent: req.body.termsAndConditions === true
+      };
+      
+      // Store as a regular job application
+      const jobApplication = await storage.createJobApplication(simplifiedData);
       
       // Log notification for debugging
       console.log(`
-        New detailed application form submission:
-        ID: ${detailedApplication.id}
+        New detailed application form submission (converted to job application):
+        ID: ${jobApplication.id}
+        Name: ${simplifiedData.firstName} ${simplifiedData.lastName}
+        Email: ${simplifiedData.email}
         Submitted: ${new Date().toISOString()}
       `);
       
       return res.status(201).json({
         success: true,
-        message: "Detailed application submitted successfully",
-        data: detailedApplication
+        message: "Application submitted successfully",
+        data: jobApplication
       });
     } catch (error) {
       console.error("Error processing detailed application form:", error);
       return res.status(500).json({
         success: false,
-        message: "An error occurred while processing your detailed application"
+        message: "An error occurred while processing your application"
       });
     }
   });
