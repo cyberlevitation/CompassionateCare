@@ -1,0 +1,12 @@
+-- Add new columns to users table for profile management
+ALTER TABLE users 
+ADD COLUMN IF NOT EXISTS preferences JSONB,
+ADD COLUMN IF NOT EXISTS phone VARCHAR,
+ADD COLUMN IF NOT EXISTS address VARCHAR,
+ADD COLUMN IF NOT EXISTS city VARCHAR,
+ADD COLUMN IF NOT EXISTS postcode VARCHAR,
+ADD COLUMN IF NOT EXISTS emergency_contact_name VARCHAR,
+ADD COLUMN IF NOT EXISTS emergency_contact_phone VARCHAR,
+ADD COLUMN IF NOT EXISTS medical_conditions TEXT,
+ADD COLUMN IF NOT EXISTS allergies TEXT,
+ADD COLUMN IF NOT EXISTS medications TEXT;
