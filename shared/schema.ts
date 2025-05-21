@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -94,3 +94,104 @@ export const serviceFeatureSchema = createInsertSchema(serviceFeatures, {
 
 export type InsertServiceFeature = z.infer<typeof serviceFeatureSchema>;
 export type ServiceFeature = typeof serviceFeatures.$inferSelect;
+
+// Booking Introduction form
+export const bookings = pgTable("bookings", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  postcode: text("postcode").notNull(),
+  serviceNeeded: text("service_needed").notNull(),
+  careFrequency: text("care_frequency").notNull(),
+  startDate: text("start_date").notNull(),
+  additionalInfo: text("additional_info"),
+  contactPreference: text("contact_preference").notNull(),
+  hearAboutUs: text("hear_about_us"),
+  dataConsent: boolean("data_consent").notNull(),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const bookingSchema = createInsertSchema(bookings, {
+  fullName: (schema) => schema.min(2, "Full name is required"),
+  email: (schema) => schema.email("Please enter a valid email"),
+  phone: (schema) => schema.min(5, "Phone number is required"),
+  address: (schema) => schema.min(5, "Address is required"),
+  postcode: (schema) => schema.min(5, "Postcode is required"),
+  serviceNeeded: (schema) => schema.min(1, "Service needed is required"),
+  careFrequency: (schema) => schema.min(1, "Care frequency is required"),
+  startDate: (schema) => schema.min(1, "Start date is required"),
+  contactPreference: (schema) => schema.min(1, "Contact preference is required"),
+  dataConsent: (schema) => schema.refine((val) => val === true, "You must consent to data processing"),
+});
+
+export type InsertBooking = z.infer<typeof bookingSchema>;
+export type Booking = typeof bookings.$inferSelect;
+
+// Job Applications table
+export const jobApplications = pgTable("job_applications", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  postcode: text("postcode").notNull(),
+  position: text("position").notNull(),
+  experience: text("experience").notNull(),
+  availability: text("availability").notNull(),
+  driversLicense: text("drivers_license").notNull(),
+  rightToWork: text("right_to_work").notNull(),
+  coverLetter: text("cover_letter").notNull(),
+  cvFileName: text("cv_file_name"),
+  referenceContact: boolean("reference_contact").notNull(),
+  dataConsent: boolean("data_consent").notNull(),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const jobApplicationSchema = createInsertSchema(jobApplications, {
+  fullName: (schema) => schema.min(2, "Full name is required"),
+  email: (schema) => schema.email("Please enter a valid email"),
+  phone: (schema) => schema.min(5, "Phone number is required"),
+  address: (schema) => schema.min(5, "Address is required"),
+  postcode: (schema) => schema.min(5, "Postcode is required"),
+  position: (schema) => schema.min(1, "Position is required"),
+  experience: (schema) => schema.min(1, "Experience level is required"),
+  availability: (schema) => schema.min(1, "Availability is required"),
+  driversLicense: (schema) => schema.min(1, "Driver's license information is required"),
+  rightToWork: (schema) => schema.min(1, "Right to work information is required"),
+  coverLetter: (schema) => schema.min(10, "Cover letter is required"),
+  referenceContact: (schema) => schema,
+  dataConsent: (schema) => schema.refine((val) => val === true, "You must consent to data processing"),
+});
+
+export type InsertJobApplication = z.infer<typeof jobApplicationSchema>;
+export type JobApplication = typeof jobApplications.$inferSelect;
+
+// Detailed Application Forms table
+export const detailedApplications = pgTable("detailed_applications", {
+  id: serial("id").primaryKey(),
+  personalDetails: json("personal_details").notNull(),
+  furtherInformation: json("further_information").notNull(),
+  nextOfKin: json("next_of_kin").notNull(),
+  fitnessForWork: json("fitness_for_work").notNull(),
+  disabilities: json("disabilities").notNull(),
+  education: json("education").notNull(),
+  employmentHistory: json("employment_history").notNull(),
+  supportingStatement: text("supporting_statement").notNull(),
+  equalityAct: text("equality_act").notNull(),
+  referees: json("referees").notNull(),
+  termsAndConditions: boolean("terms_and_conditions").notNull(),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const detailedApplicationSchema = createInsertSchema(detailedApplications);
+
+export type InsertDetailedApplication = z.infer<typeof detailedApplicationSchema>;
+export type DetailedApplication = typeof detailedApplications.$inferSelect;

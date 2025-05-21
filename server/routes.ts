@@ -1,7 +1,14 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { contactSchema, type InsertContact } from "@shared/schema";
+import { 
+  contactSchema, 
+  type InsertContact,
+  bookingSchema,
+  type InsertBooking,
+  jobApplicationSchema,
+  type InsertJobApplication 
+} from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
@@ -27,6 +34,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Error processing contact form:", error);
+      
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({
+          success: false,
+          message: "Validation error",
+          errors: validationError.details
+        });
+      }
+      
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing your request"
+      });
+    }
+  });
+
+  // Book Introduction API endpoint
+  app.post("/api/book-introduction", async (req: Request, res: Response) => {
+    try {
+      // Validate request body
+      const validatedData = bookingSchema.parse(req.body);
+      
+      // Store in database
+      const booking = await storage.createBooking(validatedData);
+      
+      // Send email notification
+      await sendBookingNotificationEmail(validatedData);
+      
+      return res.status(201).json({
+        success: true,
+        message: "Booking request sent successfully",
+        data: booking
+      });
+    } catch (error) {
+      console.error("Error processing booking form:", error);
+      
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({
+          success: false,
+          message: "Validation error",
+          errors: validationError.details
+        });
+      }
+      
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing your request"
+      });
+    }
+  });
+
+  // Job Application API endpoint
+  app.post("/api/job-application", async (req: Request, res: Response) => {
+    try {
+      // Validate request body
+      const validatedData = jobApplicationSchema.parse(req.body);
+      
+      // Store in database
+      const application = await storage.createJobApplication(validatedData);
+      
+      // Send email notification
+      await sendJobApplicationNotificationEmail(validatedData);
+      
+      return res.status(201).json({
+        success: true,
+        message: "Job application submitted successfully",
+        data: application
+      });
+    } catch (error) {
+      console.error("Error processing job application form:", error);
       
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
