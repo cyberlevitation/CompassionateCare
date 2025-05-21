@@ -61,6 +61,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const Recruitment = () => {
   const { toast } = useToast();
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -86,12 +87,24 @@ const Recruitment = () => {
       return await apiRequest('POST', '/api/job-application', data);
     },
     onSuccess: () => {
+      // Show toast notification
       toast({
         title: "Application Submitted",
         description:
           "We've received your application and will contact you shortly about the next steps.",
       });
+      
+      // Visual success state
+      setFormSubmitted(true);
+      
+      // Reset form
       form.reset();
+      
+      // Scroll to application form section to see the success message
+      const applicationForm = document.getElementById('application-form');
+      if (applicationForm) {
+        applicationForm.scrollIntoView({ behavior: 'smooth' });
+      }
     },
     onError: (error) => {
       console.error("Form submission error:", error);
@@ -101,6 +114,7 @@ const Recruitment = () => {
           "Unable to submit your application. Please try again later.",
         variant: "destructive",
       });
+      setFormSubmitted(false);
     }
   });
 

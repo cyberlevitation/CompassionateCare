@@ -32,6 +32,7 @@ type FormValues = z.infer<typeof formSchema>;
 
 const BookIntroduction = () => {
   const { toast } = useToast();
+  const [formSubmitted, setFormSubmitted] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -56,11 +57,20 @@ const BookIntroduction = () => {
       return await apiRequest('POST', '/api/book-introduction', data);
     },
     onSuccess: () => {
+      // Show toast notification
       toast({
         title: "Introduction Request Sent",
         description: "We've received your request and will contact you shortly to confirm your introduction meeting.",
       });
+      
+      // Visual success state
+      setFormSubmitted(true);
+      
+      // Reset form
       form.reset();
+      
+      // Scroll to top of the form to see the success message
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     },
     onError: (error) => {
       console.error("Form submission error:", error);
@@ -69,6 +79,7 @@ const BookIntroduction = () => {
         description: "Unable to submit your request. Please try again later.",
         variant: "destructive",
       });
+      setFormSubmitted(false);
     }
   });
 
@@ -156,6 +167,20 @@ const BookIntroduction = () => {
             
             <div className="md:col-span-3 bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-bold mb-6">Request an Introduction</h2>
+              
+              {formSubmitted && (
+                <div className="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-md p-4">
+                  <div className="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <div>
+                      <h3 className="font-bold">Introduction Request Sent Successfully!</h3>
+                      <p>Thank you for your enquiry. One of our care specialists will contact you shortly to discuss your care needs and arrange an introduction.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
               
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
