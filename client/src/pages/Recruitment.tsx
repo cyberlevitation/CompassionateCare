@@ -25,6 +25,8 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 const formSchema = z.object({
   fullName: z
@@ -58,8 +60,8 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 const Recruitment = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -80,33 +82,51 @@ const Recruitment = () => {
     },
   });
 
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-
-    try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
-      console.log("Form data submitted:", data);
-
+  const { mutate, isPending: isSubmitting } = useMutation({
+    mutationFn: async (data: FormValues) => {
+      return await apiRequest('POST', '/api/job-application', data);
+    },
+    onSuccess: () => {
+      // Show toast notification
       toast({
         title: "Application Submitted",
         description:
           "We've received your application and will contact you shortly about the next steps.",
       });
-
+      
+      // Visual success state
+      setFormSubmitted(true);
+      
+      // Reset form
       form.reset();
-    } catch (error) {
+      
+      // Scroll to application form section to see the success message
+      const applicationForm = document.getElementById('application-form');
+      if (applicationForm) {
+        applicationForm.scrollIntoView({ behavior: 'smooth' });
+      }
+    },
+    onError: (error) => {
+      console.error("Form submission error:", error);
       toast({
         title: "An error occurred",
         description:
           "Unable to submit your application. Please try again later.",
         variant: "destructive",
       });
-      console.error("Form submission error:", error);
-    } finally {
-      setIsSubmitting(false);
+      setFormSubmitted(false);
     }
+  });
+
+  const onSubmit = async (data: FormValues) => {
+    // Convert file to filename if needed (in a real app, you'd upload the file)
+    const submissionData = {
+      ...data,
+      cvFileName: data.cvFile?.name || undefined
+    };
+    
+    // Submit the form data to the API
+    mutate(submissionData);
   };
 
   const positions = [
@@ -452,6 +472,20 @@ const Recruitment = () => {
           </h2>
 
           <div className="bg-white p-6 md:p-8 rounded-lg shadow-md">
+            {formSubmitted && (
+              <div className="mb-8 bg-green-50 border border-green-200 text-green-800 rounded-md p-4">
+                <div className="flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <div>
+                    <h3 className="font-bold">Application Submitted Successfully!</h3>
+                    <p>Thank you for your application. Our recruitment team will review your details and contact you shortly about the next steps.</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}

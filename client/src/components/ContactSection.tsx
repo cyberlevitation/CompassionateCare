@@ -32,6 +32,7 @@ import { Button } from "@/components/ui/button";
 const ContactSection = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const form = useForm<ContactFormData>({
     resolver: zodResolver(contactFormSchema),
@@ -51,11 +52,17 @@ const ContactSection = () => {
       return await apiRequest("POST", "/api/contact", data);
     },
     onSuccess: () => {
+      // Show toast notification
       toast({
         title: "Message Sent!",
         description: "We'll be in touch with you soon.",
         variant: "default",
       });
+      
+      // Set success state for visual indicator
+      setFormSubmitted(true);
+      
+      // Reset form
       form.reset();
     },
     onError: (error) => {
@@ -64,6 +71,7 @@ const ContactSection = () => {
         description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive",
       });
+      setFormSubmitted(false);
     },
     onSettled: () => {
       setIsSubmitting(false);
@@ -88,7 +96,21 @@ const ContactSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
           <div>
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="bg-neutral-100 p-6 md:p-8 rounded-xl shadow-sm">
+              <form id="contact-form" onSubmit={form.handleSubmit(onSubmit)} className="bg-neutral-100 p-6 md:p-8 rounded-xl shadow-sm">
+                {formSubmitted && (
+                  <div className="mb-6 bg-green-50 border border-green-200 text-green-800 rounded-md p-4">
+                    <div className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      <div>
+                        <h3 className="font-bold">Message Sent Successfully!</h3>
+                        <p>Thank you for contacting us. We'll be in touch with you soon.</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                   <FormField
                     control={form.control}

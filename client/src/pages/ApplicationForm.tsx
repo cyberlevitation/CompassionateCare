@@ -102,6 +102,7 @@ type FormValues = z.infer<typeof formSchema>;
 export default function ApplicationForm() {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formSubmitted, setFormSubmitted] = useState(false);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -191,29 +192,57 @@ export default function ApplicationForm() {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     try {
-      await fetch("/api/application", {
+      // Format the data to match the database schema structure
+      const formattedData = {
+        personalDetails: data.personalDetails,
+        furtherInformation: data.furtherInformation,
+        nextOfKin: data.nextOfKin,
+        fitnessForWork: data.fitnessForWork,
+        disabilities: data.disabilities,
+        education: data.education,
+        employmentHistory: data.employmentHistory,
+        supportingStatement: data.supportingStatement,
+        equalityAct: data.equalityAct,
+        referees: data.referees,
+        termsAndConditions: data.termsAndConditions
+      };
+      
+      console.log("Submitting application form data:", formattedData);
+      
+      const response = await fetch("/api/detailed-application", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
-      }).then(res => {
-        if (!res.ok) {
-          throw new Error("Failed to submit application");
-        }
-        return res.json();
+        body: JSON.stringify(formattedData),
       });
       
+      const responseData = await response.json();
+      console.log("Server response:", responseData);
+      
+      if (!response.ok) {
+        throw new Error(responseData.message || "Failed to submit application");
+      }
+      
+      // Success! Show toast notification
       toast({
-        title: "Application submitted",
-        description: "Thank you for your application. We will be in touch shortly.",
+        title: "Application submitted successfully",
+        description: "Thank you for your application. Our recruitment team will review your details and contact you shortly.",
       });
+      
+      // Set form as submitted for visual feedback
+      setFormSubmitted(true);
+      
+      // Scroll to top of the page
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      // Reset form
       form.reset();
     } catch (error) {
       console.error("Error submitting form:", error);
       toast({
-        title: "Error",
-        description: "There was an error submitting your application. Please try again.",
+        title: "Application Submission Failed",
+        description: error instanceof Error ? error.message : "There was an error submitting your application. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -248,6 +277,40 @@ export default function ApplicationForm() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
+        {formSubmitted && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-8 bg-green-50 border border-green-200 text-green-800 rounded-md p-4"
+          >
+            <div className="flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-3 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div>
+                <h3 className="font-bold text-lg">Application Submitted Successfully!</h3>
+                <p className="mt-1">Thank you for your interest in joining our team. Our recruitment team will review your application and contact you shortly about the next steps.</p>
+                <div className="mt-3">
+                  <Button 
+                    onClick={() => window.location.href = "/recruitment"} 
+                    variant="outline" 
+                    className="mr-2"
+                  >
+                    Return to Careers
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setFormSubmitted(false);
+                      form.reset();
+                    }}
+                  >
+                    Submit Another Application
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             {/* Personal Details Section */}

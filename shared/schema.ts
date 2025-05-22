@@ -6,23 +6,66 @@ import {
   boolean,
   timestamp,
 } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  timestamp,
+  json,
+  varchar,
+  jsonb,
+  index,
+} from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Users table (keeping the existing one)
+// Session storage table for Replit Auth
+export const sessions = pgTable(
+  "sessions",
+  {
+    sid: varchar("sid").primaryKey(),
+    sess: jsonb("sess").notNull(),
+    expire: timestamp("expire").notNull(),
+  },
+  (table) => [index("IDX_session_expire").on(table.expire)]
+);
+
+// Users table for Replit Auth
 export const users = pgTable("users", {
-  id: serial("id").primaryKey(),
-  username: text("username").notNull().unique(),
-  password: text("password").notNull(),
+  id: varchar("id").primaryKey().notNull(),
+  email: varchar("email").unique(),
+  firstName: varchar("first_name"),
+  lastName: varchar("last_name"),
+  profileImageUrl: varchar("profile_image_url"),
+  preferences: jsonb("preferences"),
+  phone: varchar("phone"),
+  address: varchar("address"),
+  city: varchar("city"),
+  postcode: varchar("postcode"),
+  emergencyContactName: varchar("emergency_contact_name"),
+  emergencyContactPhone: varchar("emergency_contact_phone"),
+  medicalConditions: text("medical_conditions"),
+  allergies: text("allergies"),
+  medications: text("medications"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
-  username: true,
-  password: true,
+  id: true,
+  email: true,
+  firstName: true,
+  lastName: true,
+  profileImageUrl: true,
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
+
+// Alias to match the example
+export type UpsertUser = InsertUser;
 
 // Contact form submissions
 export const contacts = pgTable("contacts", {
@@ -109,117 +152,160 @@ export const serviceFeatureSchema = createInsertSchema(serviceFeatures, {
 export type InsertServiceFeature = z.infer<typeof serviceFeatureSchema>;
 export type ServiceFeature = typeof serviceFeatures.$inferSelect;
 
-// Application form submissions
-export const applications = pgTable("applications", {
+// Booking Introduction form
+export const bookings = pgTable("bookings", {
   id: serial("id").primaryKey(),
-  // Personal Details
-  personalDetails: text("personal_details").notNull(), // JSON string
-  // Further Information
-  furtherInformation: text("further_information").notNull(), // JSON string
-  // Next of Kin
-  nextOfKin: text("next_of_kin").notNull(), // JSON string
-  // Fitness For Work
-  fitnessForWork: text("fitness_for_work").notNull(), // JSON string
-  // Disabilities
-  disabilities: text("disabilities").notNull(), // JSON string
-  // Education
-  education: text("education").notNull(), // JSON string
-  // Employment History
-  employmentHistory: text("employment_history").notNull(), // JSON string
-  // Supporting Statement
-  supportingStatement: text("supporting_statement").notNull(),
-  // Equality Act
-  equalityAct: text("equality_act").notNull(),
-  // Referees
-  referees: text("referees").notNull(), // JSON string
-  // Terms and Conditions
-  termsAndConditions: boolean("terms_and_conditions").notNull(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  postcode: text("postcode").notNull(),
+  serviceNeeded: text("service_needed").notNull(),
+  careFrequency: text("care_frequency").notNull(),
+  startDate: text("start_date").notNull(),
+  additionalInfo: text("additional_info"),
+  contactPreference: text("contact_preference").notNull(),
+  hearAboutUs: text("hear_about_us"),
+  dataConsent: boolean("data_consent").notNull(),
+  status: text("status").notNull().default("new"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-export const applicationSchema = z.object({
-  personalDetails: z.object({
-    title: z.string().min(1),
-    forename: z.string().min(1),
-    surname: z.string().min(1),
-    birthName: z.string().optional(),
-    address: z.string().min(1),
-    postcode: z.string().min(1),
-    telephone: z.string().optional(),
-    mobile: z.string().min(1),
-    email: z.string().email(),
-    nationality: z.string().min(1),
-    passportNumber: z.string().min(1),
-    birthDate: z.string().min(1),
-    passportExpiryDate: z.string().min(1),
-    nationalInsuranceNumber: z.string().min(1),
-  }),
-  furtherInformation: z.object({
-    drivingLicense: z.enum(["yes", "no"]),
-    endorsements: z.string().optional(),
-    licenseIssuedLocation: z.string().optional(),
-    ownVehicle: z.enum(["yes", "no"]),
-    manualDriver: z.boolean().optional(),
-    automaticDriver: z.boolean().optional(),
-    driveClientVehicle: z.enum(["yes", "no"]),
-    businessInsurance: z.enum(["yes", "no"]),
-    previouslyApplied: z.enum(["yes", "no"]),
-    previouslyWorked: z.enum(["yes", "no"]),
-    workedOtherAgency: z.enum(["yes", "no"]),
-    otherAgencyName: z.string().optional(),
-  }),
-  nextOfKin: z.object({
-    title: z.string().min(1),
-    forename: z.string().min(1),
-    surname: z.string().min(1),
-    address: z.string().min(1),
-    postcode: z.string().min(1),
-    contactNumber: z.string().min(1),
-    email: z.string().email().optional(),
-    relationship: z.string().min(1),
-  }),
-  fitnessForWork: z.object({
-    name: z.string().min(1),
-    date: z.string().min(1),
-  }),
-  disabilities: z.object({
-    specialArrangements: z.enum(["yes", "no"]),
-    details: z.string().optional(),
-  }),
-  education: z.object({
-    educationHistory: z.string().min(1),
-    manualHandling: z.boolean().optional(),
-    firstAid: z.boolean().optional(),
-    foodHygiene: z.boolean().optional(),
-    infectionControl: z.boolean().optional(),
-    firePrevention: z.boolean().optional(),
-    sova: z.boolean().optional(),
-    dementia: z.boolean().optional(),
-    healthAndSafety: z.boolean().optional(),
-  }),
-  employmentHistory: z.object({
-    history: z.string().min(1),
-    formalInvestigation: z.enum(["yes", "no"]),
-    investigationDetails: z.string().optional(),
-  }),
-  supportingStatement: z.string().min(1),
-  equalityAct: z.enum(["yes", "no", "prefer"]),
-  referees: z.object({
-    currentEmployerName: z.string().min(1),
-    currentEmployerAddress: z.string().min(1),
-    currentEmployerPostcode: z.string().min(1),
-    currentEmployerTelephone: z.string().min(1),
-    currentEmployerEmail: z.string().email(),
-    previousEmployerName: z.string().min(1),
-    previousEmployerAddress: z.string().min(1),
-    previousEmployerPostcode: z.string().min(1),
-    previousEmployerTelephone: z.string().min(1),
-    previousEmployerEmail: z.string().email(),
-  }),
-  termsAndConditions: z.boolean().refine((value) => value === true, {
-    message: "You must agree to the terms and conditions",
-  }),
+export const bookingSchema = createInsertSchema(bookings, {
+  fullName: (schema) => schema.min(2, "Full name is required"),
+  email: (schema) => schema.email("Please enter a valid email"),
+  phone: (schema) => schema.min(5, "Phone number is required"),
+  address: (schema) => schema.min(5, "Address is required"),
+  postcode: (schema) => schema.min(5, "Postcode is required"),
+  serviceNeeded: (schema) => schema.min(1, "Service needed is required"),
+  careFrequency: (schema) => schema.min(1, "Care frequency is required"),
+  startDate: (schema) => schema.min(1, "Start date is required"),
+  contactPreference: (schema) =>
+    schema.min(1, "Contact preference is required"),
+  dataConsent: (schema) =>
+    schema.refine((val) => val === true, "You must consent to data processing"),
 });
 
-export type InsertApplication = z.infer<typeof applicationSchema>;
-export type Application = typeof applications.$inferSelect;
+export type InsertBooking = z.infer<typeof bookingSchema>;
+export type Booking = typeof bookings.$inferSelect;
+
+// Job Applications table
+export const jobApplications = pgTable("job_applications", {
+  id: serial("id").primaryKey(),
+  fullName: text("full_name").notNull(),
+  email: text("email").notNull(),
+  phone: text("phone").notNull(),
+  address: text("address").notNull(),
+  postcode: text("postcode").notNull(),
+  position: text("position").notNull(),
+  experience: text("experience").notNull(),
+  availability: text("availability").notNull(),
+  driversLicense: text("drivers_license").notNull(),
+  rightToWork: text("right_to_work").notNull(),
+  coverLetter: text("cover_letter").notNull(),
+  cvFileName: text("cv_file_name"),
+  referenceContact: boolean("reference_contact").notNull(),
+  dataConsent: boolean("data_consent").notNull(),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const jobApplicationSchema = createInsertSchema(jobApplications, {
+  fullName: (schema) => schema.min(2, "Full name is required"),
+  email: (schema) => schema.email("Please enter a valid email"),
+  phone: (schema) => schema.min(5, "Phone number is required"),
+  address: (schema) => schema.min(5, "Address is required"),
+  postcode: (schema) => schema.min(5, "Postcode is required"),
+  position: (schema) => schema.min(1, "Position is required"),
+  experience: (schema) => schema.min(1, "Experience level is required"),
+  availability: (schema) => schema.min(1, "Availability is required"),
+  driversLicense: (schema) =>
+    schema.min(1, "Driver's license information is required"),
+  rightToWork: (schema) =>
+    schema.min(1, "Right to work information is required"),
+  coverLetter: (schema) => schema.min(10, "Cover letter is required"),
+  referenceContact: (schema) => schema,
+  dataConsent: (schema) =>
+    schema.refine((val) => val === true, "You must consent to data processing"),
+});
+
+export type InsertJobApplication = z.infer<typeof jobApplicationSchema>;
+export type JobApplication = typeof jobApplications.$inferSelect;
+
+// Detailed Application Forms table
+export const detailedApplications = pgTable("detailed_applications", {
+  id: serial("id").primaryKey(),
+  personalDetails: json("personal_details").notNull(),
+  furtherInformation: json("further_information").notNull(),
+  nextOfKin: json("next_of_kin").notNull(),
+  fitnessForWork: json("fitness_for_work").notNull(),
+  disabilities: json("disabilities").notNull(),
+  education: json("education").notNull(),
+  employmentHistory: json("employment_history").notNull(),
+  supportingStatement: text("supporting_statement").notNull(),
+  equalityAct: text("equality_act").notNull(),
+  referees: json("referees").notNull(),
+  termsAndConditions: boolean("terms_and_conditions").notNull(),
+  status: text("status").notNull().default("new"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const detailedApplicationSchema =
+  createInsertSchema(detailedApplications);
+
+export type InsertDetailedApplication = z.infer<
+  typeof detailedApplicationSchema
+>;
+export type DetailedApplication = typeof detailedApplications.$inferSelect;
+
+// Appointments table
+export const appointments = pgTable("appointments", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull(), // matches users.id which is varchar
+  appointmentType: varchar("appointment_type").notNull(),
+  date: timestamp("date").notNull(),
+  duration: integer("duration").notNull(), // in minutes
+  status: varchar("status").notNull().default("scheduled"),
+  notes: text("notes"),
+  careProviderId: integer("care_provider_id"),
+  location: varchar("location").notNull().default("client_home"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const appointmentSchema = createInsertSchema(appointments, {
+  appointmentType: (schema) => schema.min(2, "Appointment type is required"),
+  date: (schema) => schema,
+  duration: (schema) => schema.min(1, "Duration is required"),
+  notes: (schema) => schema.optional(),
+});
+
+export type InsertAppointment = z.infer<typeof appointmentSchema>;
+export type Appointment = typeof appointments.$inferSelect;
+
+// Care Providers table
+export const careProviders = pgTable("care_providers", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id"), // matches users.id which is varchar
+  firstName: varchar("first_name").notNull(),
+  lastName: varchar("last_name").notNull(),
+  title: varchar("title").notNull(),
+  specialization: varchar("specialization"),
+  bio: text("bio"),
+  imageUrl: varchar("image_url"),
+  isActive: boolean("is_active").default(true).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+export const careProviderSchema = createInsertSchema(careProviders, {
+  firstName: (schema) => schema.min(2, "First name is required"),
+  lastName: (schema) => schema.min(2, "Last name is required"),
+  title: (schema) => schema.min(2, "Title is required"),
+});
+
+export type InsertCareProvider = z.infer<typeof careProviderSchema>;
+export type CareProvider = typeof careProviders.$inferSelect;
