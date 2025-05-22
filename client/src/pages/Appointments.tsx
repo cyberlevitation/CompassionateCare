@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import UserLayout from "@/components/UserLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { Link } from "wouter";
@@ -120,7 +120,7 @@ export default function Appointments() {
   };
 
   return (
-    <ProtectedRoute>
+    <UserLayout>
       <Helmet>
         <title>My Appointments | Super Health Care</title>
         <meta name="description" content="View and manage your scheduled appointments with Super Health Care." />
@@ -254,6 +254,6 @@ export default function Appointments() {
           </Card>
         )}
       </motion.div>
-    </ProtectedRoute>
+    </UserLayout>
   );
 }

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import UserLayout from "@/components/UserLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, FileText, User } from "lucide-react";
@@ -28,7 +28,7 @@ export default function Dashboard() {
   });
 
   return (
-    <ProtectedRoute>
+    <UserLayout>
       <Helmet>
         <title>Dashboard | Super Health Care</title>
         <meta name="description" content="View your care dashboard, appointments, and health information." />
@@ -186,6 +186,6 @@ export default function Dashboard() {
           </motion.div>
         </div>
       </div>
-    </ProtectedRoute>
+    </UserLayout>
   );
 }

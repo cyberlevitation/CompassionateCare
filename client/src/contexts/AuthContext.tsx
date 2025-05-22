@@ -70,6 +70,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           title: "Login successful",
           description: `Welcome${user.displayName ? ', ' + user.displayName.split(' ')[0] : ''}!`,
         });
+        // Redirect to dashboard after successful login
+        window.location.href = '/dashboard';
         return user;
       } else {
         toast({

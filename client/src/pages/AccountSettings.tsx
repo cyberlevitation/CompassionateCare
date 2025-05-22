@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
 import { useAuth } from "@/contexts/AuthContext";
-import ProtectedRoute from "@/components/ProtectedRoute";
+import UserLayout from "@/components/UserLayout";
 import { Button } from "@/components/ui/button";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -204,7 +204,7 @@ export default function AccountSettings() {
   };
 
   return (
-    <ProtectedRoute>
+    <UserLayout>
       <Helmet>
         <title>Account Settings | Super Health Care</title>
         <meta name="description" content="Manage your account settings and personal information." />
@@ -580,6 +580,6 @@ export default function AccountSettings() {
           </TabsContent>
         </Tabs>
       </motion.div>
-    </ProtectedRoute>
+    </UserLayout>
   );
 }
