@@ -4,7 +4,7 @@ import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
-import { signInWithGoogle, signOutUser } from "@/lib/firebase";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,8 +20,7 @@ const Header = () => {
   const isMobile = useMobile();
   const [location] = useLocation();
   const [isScrolled, setIsScrolled] = useState(false);
-  const { currentUser, loading } = useAuth();
-  const isAuthenticated = !!currentUser;
+  const { currentUser, loading, login, logout, isAuthenticated } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
