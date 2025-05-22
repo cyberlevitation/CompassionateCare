@@ -147,6 +147,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     currentUser,
     loading,
     login,
+    signup,
     logout,
     isAuthenticated: !!currentUser
   };

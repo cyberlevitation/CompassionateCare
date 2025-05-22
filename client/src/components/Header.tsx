@@ -4,6 +4,7 @@ import { Menu, X, User, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/contexts/AuthContext";
+import LoginButton from "@/components/auth/LoginButton";
 
 import {
   DropdownMenu,
@@ -232,12 +233,7 @@ const Header = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Button 
-              onClick={() => login()}
-              className="font-raleway font-medium bg-secondary text-white hover:bg-secondary/90 transition-colors"
-            >
-              Log In
-            </Button>
+            <LoginButton />
           )}
           <a 
             href="tel:01702333120" 
