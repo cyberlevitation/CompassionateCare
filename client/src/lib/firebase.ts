@@ -1,19 +1,15 @@
 import { initializeApp } from "firebase/app";
 import { 
   getAuth, 
-  signInWithPopup, 
-  signInWithRedirect,
-  GoogleAuthProvider, 
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
   signOut,
-  getRedirectResult,
   onAuthStateChanged,
-  User
+  User,
+  updateProfile
 } from "firebase/auth";
 
-// This environment file requires the following Firebase config variables:
-// VITE_FIREBASE_API_KEY - Your Firebase API key
-// VITE_FIREBASE_PROJECT_ID - Your Firebase project ID
-// VITE_FIREBASE_APP_ID - Your Firebase app ID
+// Firebase configuration
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebaseapp.com`,
@@ -28,24 +24,54 @@ const app = initializeApp(firebaseConfig);
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
 
-// Configure Google Auth Provider with custom parameters
-const googleProvider = new GoogleAuthProvider();
-googleProvider.setCustomParameters({
-  prompt: 'select_account'
-});
+/**
+ * Sign up with email and password
+ * @param email User's email
+ * @param password User's password
+ * @param displayName User's display name
+ * @returns User object if sign up is successful
+ */
+export const signUpWithEmail = async (
+  email: string, 
+  password: string, 
+  displayName: string
+): Promise<User | null> => {
+  try {
+    console.log("Starting email sign-up process");
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    
+    // Add display name to the user profile
+    if (userCredential.user) {
+      await updateProfile(userCredential.user, {
+        displayName: displayName
+      });
+    }
+    
+    console.log("Sign-up successful");
+    return userCredential.user;
+  } catch (error) {
+    console.error("Error signing up with email:", error);
+    return null;
+  }
+};
 
 /**
- * Sign in with Google using popup
+ * Sign in with email and password
+ * @param email User's email
+ * @param password User's password
  * @returns User object if sign in is successful
  */
-export const signInWithGoogle = async (): Promise<User | null> => {
+export const signInWithEmail = async (
+  email: string, 
+  password: string
+): Promise<User | null> => {
   try {
-    console.log("Starting Google sign-in process");
-    const result = await signInWithPopup(auth, googleProvider);
+    console.log("Starting email sign-in process");
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     console.log("Sign-in successful");
-    return result.user;
+    return userCredential.user;
   } catch (error) {
-    console.error("Error signing in with Google:", error);
+    console.error("Error signing in with email:", error);
     return null;
   }
 };

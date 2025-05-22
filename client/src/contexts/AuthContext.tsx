@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, signInWithGoogle, signOutUser } from '@/lib/firebase';
+import { auth, signInWithEmail, signUpWithEmail, signOutUser } from '@/lib/firebase';
 import { useToast } from '@/hooks/use-toast';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -8,7 +8,8 @@ import { useQueryClient } from '@tanstack/react-query';
 interface AuthContextType {
   currentUser: User | null;
   loading: boolean;
-  login: () => Promise<void>;
+  login: (email: string, password: string) => Promise<User | null>;
+  signup: (email: string, password: string, displayName: string) => Promise<User | null>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
@@ -17,7 +18,8 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   currentUser: null,
   loading: true,
-  login: async () => {},
+  login: async () => null,
+  signup: async () => null,
   logout: async () => {},
   isAuthenticated: false
 });
@@ -56,24 +58,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     return unsubscribe;
   }, [queryClient]);
 
-  // Login function
-  const login = async () => {
-    if (isLoggingIn) return;
+  // Login function with email and password
+  const login = async (email: string, password: string): Promise<User | null> => {
+    if (isLoggingIn) return null;
     
     setIsLoggingIn(true);
     try {
-      const user = await signInWithGoogle();
+      const user = await signInWithEmail(email, password);
       if (user) {
         toast({
           title: "Login successful",
           description: `Welcome${user.displayName ? ', ' + user.displayName.split(' ')[0] : ''}!`,
         });
+        return user;
       } else {
         toast({
           title: "Login failed",
-          description: "There was a problem logging in. Please try again.",
+          description: "There was a problem logging in. Please check your email and password.",
           variant: "destructive",
         });
+        return null;
       }
     } catch (error) {
       console.error("Login error:", error);
@@ -82,6 +86,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
+      return null;
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+  
+  // Sign up function with email, password and display name
+  const signup = async (email: string, password: string, displayName: string): Promise<User | null> => {
+    setIsLoggingIn(true);
+    try {
+      const user = await signUpWithEmail(email, password, displayName);
+      if (user) {
+        toast({
+          title: "Sign up successful",
+          description: `Welcome to Super Health Care, ${displayName}!`,
+        });
+        return user;
+      } else {
+        toast({
+          title: "Sign up failed",
+          description: "There was a problem creating your account. Please try again.",
+          variant: "destructive",
+        });
+        return null;
+      }
+    } catch (error) {
+      console.error("Signup error:", error);
+      toast({
+        title: "Sign up error",
+        description: "An unexpected error occurred. Please try again.",
+        variant: "destructive",
+      });
+      return null;
     } finally {
       setIsLoggingIn(false);
     }
