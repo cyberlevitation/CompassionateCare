@@ -1,7 +1,12 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { contactSchema, type InsertContact } from "@shared/schema";
+import {
+  contactSchema,
+  type InsertContact,
+  applicationSchema,
+  type InsertApplication,
+} from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
@@ -13,33 +18,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       // Validate request body
       const validatedData = contactSchema.parse(req.body);
-      
+
       // Store in database
       const contact = await storage.createContact(validatedData);
-      
+
       // Send email notification about the new contact
       await sendContactNotificationEmail(validatedData);
-      
+
       return res.status(201).json({
         success: true,
         message: "Contact message sent successfully",
-        data: contact
+        data: contact,
       });
     } catch (error) {
       console.error("Error processing contact form:", error);
-      
+
       if (error instanceof ZodError) {
         const validationError = fromZodError(error);
         return res.status(400).json({
           success: false,
           message: "Validation error",
-          errors: validationError.details
+          errors: validationError.details,
         });
       }
-      
+
       return res.status(500).json({
         success: false,
-        message: "An error occurred while processing your request"
+        message: "An error occurred while processing your request",
+      });
+    }
+  });
+
+  // Application API endpoint
+  app.post("/api/application", async (req: Request, res: Response) => {
+    try {
+      // Validate request body
+      const validatedData = applicationSchema.parse(req.body);
+
+      // Store in database
+      const application = await storage.createApplication(validatedData);
+
+      // Optionally, send notification email about the new application
+      await sendApplicationNotificationEmail(validatedData);
+
+      return res.status(201).json({
+        success: true,
+        message: "Application submitted successfully",
+        data: application,
+      });
+    } catch (error) {
+      console.error("Error processing application form:", error);
+
+      if (error instanceof ZodError) {
+        const validationError = fromZodError(error);
+        return res.status(400).json({
+          success: false,
+          message: "Validation error",
+          errors: validationError.details,
+        });
+      }
+
+      return res.status(500).json({
+        success: false,
+        message: "An error occurred while processing your request",
       });
     }
   });
@@ -57,10 +98,10 @@ async function sendContactNotificationEmail(contact: InsertContact) {
       Name: ${contact.firstName} ${contact.lastName}
       Email: ${contact.email}
       Phone: ${contact.phone}
-      Service: ${contact.service || 'Not specified'}
+      Service: ${contact.service || "Not specified"}
       Message: ${contact.message}
     `);
-    
+
     // Example of how you would set up nodemailer in production
     /*
     const transporter = nodemailer.createTransport({
@@ -94,10 +135,28 @@ async function sendContactNotificationEmail(contact: InsertContact) {
       `,
     });
     */
-    
+
     return true;
   } catch (error) {
     console.error("Error sending email notification:", error);
+    return false;
+  }
+}
+
+async function sendApplicationNotificationEmail(
+  application: InsertApplication
+) {
+  try {
+    // Log application submission (customize as needed)
+    console.log(`
+      New application form submission:
+      Name: ${application.personalDetails.forename} ${application.personalDetails.surname}
+      Email: ${application.personalDetails.email}
+      Mobile: ${application.personalDetails.mobile}
+    `);
+    return true;
+  } catch (error) {
+    console.error("Error sending application notification:", error);
     return false;
   }
 }
