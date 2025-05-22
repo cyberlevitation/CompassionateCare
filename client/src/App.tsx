@@ -70,10 +70,12 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Layout>
-        <Router />
-      </Layout>
-      <Toaster />
+      <AuthProvider>
+        <Layout>
+          <Router />
+        </Layout>
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }
