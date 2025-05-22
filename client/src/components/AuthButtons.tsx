@@ -16,10 +16,11 @@ import { Link } from "wouter";
 export const LoginButton = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     setIsLoggingIn(true);
     try {
-      signInWithGoogle();
+      await signInWithGoogle();
+      // The redirect will happen automatically, so we don't need to handle success here
     } catch (error) {
       console.error("Login error:", error);
       setIsLoggingIn(false);
