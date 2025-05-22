@@ -1,0 +1,14 @@
+Error signing up with email: 
+_FirebaseError {code: "auth/configuration-not-found", customData: {…}, name: "FirebaseError"}
+code: "auth/configuration-not-found"
+customData: Object
+name: "FirebaseError"
+message: "Firebase: Error (auth/configuration-not-found)."
+stack: "FirebaseError: Firebase: Error (auth/configuration-not-found).↵ at createErrorInternal (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/firebase_auth.js?v=e6af1a04:697:37)↵ at _fail (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/firebase_auth.js?v=e6af1a04:662:9)↵ at _performFetchWithErrorHandling (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/firebase_auth.js?v=e6af1a04:1132:9)↵ at async _performSignInRequest (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/firebase_auth.js?v=e6af1a04:1143:26)↵ at async createUserWithEmailAndPassword (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/firebase_auth.js?v=e6af1a04:4857:20)↵ at async signUpWithEmail (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/src/lib/firebase.ts:22:28)↵ at async signup (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/src/contexts/AuthContext.tsx:89:20)↵ at async onSubmit (https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/src/components/auth/SignupForm.tsx:61:7)↵ at async https://656a0e35-ca6b-4d38-959d-28b434215c67-00-3qakcpms908ms.janeway.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=e6af1a04:1465:9"
+get stack: ƒ ()
+set stack: ƒ ()
+[[Prototype]]: Object
+constructor: ƒ class _FirebaseError extends Error {↵ constructor(code, message, customData) {↵ super(message);↵ this.code = code;↵ this.customData = customData;↵ this.name = ERROR_NAME;↵ Object.setPrototypeOf(this, _FirebaseError.prototype);↵ if (Error.captureStackTrace) {↵ Error.captureStackTrace(this, ErrorFactory.prototype.create);↵ }↵ }↵}
+[[Prototype]]: Object
+
+Starting email sign-in process
