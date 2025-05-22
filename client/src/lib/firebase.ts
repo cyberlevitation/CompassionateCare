@@ -5,8 +5,7 @@ import {
   GoogleAuthProvider, 
   signOut,
   getRedirectResult,
-  onAuthStateChanged,
-  signInWithRedirect
+  onAuthStateChanged
 } from "firebase/auth";
 
 // Firebase configuration
@@ -19,7 +18,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
 // Initialize Firebase Authentication
 export const auth = getAuth(app);
@@ -30,39 +29,21 @@ googleProvider.setCustomParameters({
   prompt: 'select_account'
 });
 
-// Sign in with Google using popup
+// Sign in with Google
 export const signInWithGoogle = async () => {
   try {
-    console.log("Starting Google sign-in process");
-    // Using popup is more reliable in development environments
     const result = await signInWithPopup(auth, googleProvider);
-    console.log("Sign-in successful:", result.user);
-    return result;
+    return result.user;
   } catch (error) {
     console.error("Error signing in with Google:", error);
     throw error;
   }
 };
 
-// Handle redirect result (if using signInWithRedirect)
-export const handleRedirectResult = async () => {
-  try {
-    const result = await getRedirectResult(auth);
-    if (result) {
-      console.log("Redirect result:", result.user);
-    }
-    return result;
-  } catch (error) {
-    console.error("Error handling redirect:", error);
-    throw error;
-  }
-};
-
-// Sign out function
-export const logOut = async () => {
+// Sign out
+export const signOutUser = async () => {
   try {
     await signOut(auth);
-    console.log("Signed out successfully");
     return true;
   } catch (error) {
     console.error("Error signing out:", error);
@@ -70,7 +51,7 @@ export const logOut = async () => {
   }
 };
 
-// Check if user is already authenticated
+// Get current user
 export const getCurrentUser = () => {
   return new Promise((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
