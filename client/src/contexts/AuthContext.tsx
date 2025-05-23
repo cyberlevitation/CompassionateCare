@@ -159,6 +159,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         className: "bg-blue-50 border-blue-200 text-blue-800",
       });
       queryClient.clear();
+      
+      // Redirect to homepage after successful logout
+      window.location.href = '/';
     } catch (error) {
       console.error("Logout error:", error);
       toast({
