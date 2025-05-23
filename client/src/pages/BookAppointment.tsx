@@ -186,6 +186,9 @@ export default function BookAppointment() {
         const availability = await response.json();
         setProviderAvailability(availability);
         
+        // Debug the availability data
+        console.log("Provider availability data:", availability);
+        
         // Update available times based on provider's schedule
         const availableTimeSlots = availability
           .filter((slot: {date: string, available: boolean}) => slot.available)
@@ -194,10 +197,14 @@ export default function BookAppointment() {
             return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
           });
         
+        console.log("Available time slots:", availableTimeSlots);
+        
+        // Always ensure we have time slots to select from
         if (availableTimeSlots.length > 0) {
           setAvailableTimes(availableTimeSlots);
         } else {
-          // If no times available, keep default times
+          // If no times available, set default time slots
+          console.log("No provider-specific times available, using default time slots");
           setAvailableTimes(timeSlots);
         }
       }

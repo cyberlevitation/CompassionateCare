@@ -70,11 +70,24 @@ export default function Appointments() {
   });
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return new Intl.DateTimeFormat('en-GB', {
-      dateStyle: 'medium',
-      timeStyle: 'short'
-    }).format(date);
+    try {
+      if (!dateString) return 'N/A';
+      
+      const date = new Date(dateString);
+      
+      // Check if date is valid before formatting
+      if (isNaN(date.getTime())) {
+        return 'Invalid date';
+      }
+      
+      return new Intl.DateTimeFormat('en-GB', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      }).format(date);
+    } catch (error) {
+      console.error("Date formatting error:", error);
+      return 'Invalid date';
+    }
   };
 
   const getStatusColor = (status: string) => {
