@@ -119,6 +119,7 @@ export default function BookAppointment() {
   // Form state
   const [selectedProvider, setSelectedProvider] = useState<CareProvider | null>(null);
   const [providerAvailability, setProviderAvailability] = useState<{date: string, available: boolean}[]>([]);
+  const [availableTimes, setAvailableTimes] = useState<string[]>(timeSlots);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -186,15 +187,15 @@ export default function BookAppointment() {
         setProviderAvailability(availability);
         
         // Update available times based on provider's schedule
-        const availableTimes = availability
-          .filter(slot => slot.available)
-          .map(slot => {
+        const availableTimeSlots = availability
+          .filter((slot: {date: string, available: boolean}) => slot.available)
+          .map((slot: {date: string, available: boolean}) => {
             const date = new Date(slot.date);
             return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
           });
         
-        if (availableTimes.length > 0) {
-          setAvailableTimes(availableTimes);
+        if (availableTimeSlots.length > 0) {
+          setAvailableTimes(availableTimeSlots);
         } else {
           // If no times available, keep default times
           setAvailableTimes(timeSlots);
@@ -434,7 +435,7 @@ export default function BookAppointment() {
                                     </SelectTrigger>
                                   </FormControl>
                                   <SelectContent>
-                                    {timeSlots.map(time => (
+                                    {availableTimes.map(time => (
                                       <SelectItem key={time} value={time}>
                                         {time}
                                       </SelectItem>
