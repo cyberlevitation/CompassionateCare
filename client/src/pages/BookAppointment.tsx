@@ -118,6 +118,7 @@ export default function BookAppointment() {
   
   // Form state
   const [selectedProvider, setSelectedProvider] = useState<CareProvider | null>(null);
+  const [providerAvailability, setProviderAvailability] = useState<{date: string, available: boolean}[]>([]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -157,10 +158,54 @@ export default function BookAppointment() {
     if (selectedCareProviderId && careProviders.length > 0) {
       const provider = careProviders.find(p => p.id === selectedCareProviderId);
       setSelectedProvider(provider || null);
+      
+      // Fetch provider availability when provider changes
+      if (provider && selectedDate) {
+        fetchProviderAvailability(provider.id, selectedDate);
+      }
     } else {
       setSelectedProvider(null);
     }
   }, [selectedCareProviderId, careProviders]);
+  
+  // Function to fetch provider availability
+  const fetchProviderAvailability = async (providerId: number, date: Date) => {
+    try {
+      const startOfDay = new Date(date);
+      startOfDay.setHours(0, 0, 0, 0);
+      
+      const endOfDay = new Date(date);
+      endOfDay.setHours(23, 59, 59, 999);
+      
+      const response = await fetch(
+        `/api/care-providers/${providerId}/availability?startDate=${startOfDay.toISOString()}&endDate=${endOfDay.toISOString()}`
+      );
+      
+      if (response.ok) {
+        const availability = await response.json();
+        setProviderAvailability(availability);
+        
+        // Update available times based on provider's schedule
+        const availableTimes = availability
+          .filter(slot => slot.available)
+          .map(slot => {
+            const date = new Date(slot.date);
+            return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          });
+        
+        if (availableTimes.length > 0) {
+          setAvailableTimes(availableTimes);
+        } else {
+          // If no times available, keep default times
+          setAvailableTimes(timeSlots);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching provider availability:", error);
+      // Fall back to default time slots
+      setAvailableTimes(timeSlots);
+    }
+  };
 
   // Mutation for creating appointments
   const appointmentMutation = useMutation({
