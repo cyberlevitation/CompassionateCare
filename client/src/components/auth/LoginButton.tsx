@@ -44,9 +44,19 @@ const LoginButton = () => {
         </DialogHeader>
 
         <Tabs defaultValue="login" className="pt-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 bg-gray-100 rounded-lg p-1.5 border-gray-200 border">
+            <TabsTrigger 
+              value="login" 
+              className="rounded-md font-medium transition-all data-[state=active]:bg-[#e30613] data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+            >
+              Login
+            </TabsTrigger>
+            <TabsTrigger 
+              value="signup" 
+              className="rounded-md font-medium transition-all data-[state=active]:bg-[#e30613] data-[state=active]:text-white data-[state=inactive]:text-gray-700 data-[state=inactive]:hover:bg-gray-200"
+            >
+              Sign Up
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="login" className="p-1">
             <LoginForm onSuccess={() => setIsOpen(false)} />

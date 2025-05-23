@@ -51,14 +51,21 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
       toast({
         title: "Account created successfully!",
         description: "Welcome to Super Health Care",
+        variant: "default",
+        className: "bg-green-50 border-green-200 text-green-800",
       });
       if (onSuccess) onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup error:", error);
+      
+      // Display a friendly error message based on the error
+      const errorMessage = error.message || "There was a problem creating your account. Please try again.";
+      
       toast({
         title: "Signup failed",
-        description: "There was a problem creating your account. Please try again.",
+        description: errorMessage,
         variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
       });
     } finally {
       setIsLoading(false);

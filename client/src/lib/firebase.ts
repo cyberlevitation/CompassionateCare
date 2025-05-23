@@ -49,9 +49,22 @@ export const signUpWithEmail = async (
     
     console.log("Sign-up successful");
     return userCredential.user;
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error signing up with email:", error);
-    return null;
+    
+    // Throw specific error messages based on Firebase error codes
+    if (error.code === 'auth/email-already-in-use') {
+      throw new Error('This email is already registered. Please use a different email or log in instead.');
+    } else if (error.code === 'auth/weak-password') {
+      throw new Error('Password is too weak. Please use a stronger password.');
+    } else if (error.code === 'auth/invalid-email') {
+      throw new Error('The email address is not valid.');
+    } else if (error.code === 'auth/operation-not-allowed') {
+      throw new Error('Email/password accounts are not enabled. Please contact support.');
+    }
+    
+    // Re-throw the original error if it's not a specific case we handle
+    throw error;
   }
 };
 
