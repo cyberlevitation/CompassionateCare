@@ -46,19 +46,42 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const insertUserSchema = createInsertSchema(users).pick({
-  id: true,
-  email: true,
-  firstName: true,
-  lastName: true,
-  profileImageUrl: true,
+export const insertUserSchema = createInsertSchema(users, {
+  // This is to ensure all fields are properly validated
+  preferences: (schema) => schema.optional(),
+  phone: (schema) => schema.optional(),
+  address: (schema) => schema.optional(),
+  city: (schema) => schema.optional(),
+  postcode: (schema) => schema.optional(),
+  emergencyContactName: (schema) => schema.optional(),
+  emergencyContactPhone: (schema) => schema.optional(),
+  medicalConditions: (schema) => schema.optional(),
+  allergies: (schema) => schema.optional(),
+  medications: (schema) => schema.optional(),
 });
 
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
 // Alias to match the example
-export type UpsertUser = InsertUser;
+// Ensure UpsertUser contains all the fields we need for our users
+export type UpsertUser = {
+  id: string;
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  profileImageUrl?: string;
+  preferences?: any;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postcode?: string;
+  emergencyContactName?: string;
+  emergencyContactPhone?: string;
+  medicalConditions?: string;
+  allergies?: string;
+  medications?: string;
+};
 
 // Contact form submissions
 export const contacts = pgTable("contacts", {
