@@ -28,6 +28,7 @@ import Dashboard from "@/pages/Dashboard";
 import AccountSettings from "@/pages/AccountSettings";
 import BookAppointment from "@/pages/BookAppointment";
 import Appointments from "@/pages/Appointments";
+import CareJourney from "@/pages/CareJourney";
 
 function Router() {
   const [location] = useLocation();

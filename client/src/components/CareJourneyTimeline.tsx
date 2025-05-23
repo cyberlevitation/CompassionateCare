@@ -7,6 +7,7 @@ import { format, differenceInDays, parseISO } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { Award, Calendar, Heart, Star, Check, Sparkles, Trophy } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import React from 'react';
 
 // Care journey milestone types
 interface Milestone {
@@ -300,7 +301,7 @@ export default function CareJourneyTimeline() {
                     : 'border-gray-300 bg-white'
                 }`}
               >
-                {React.createElement(icons[milestone.icon], {
+                {icons[milestone.icon as keyof typeof icons] && React.createElement(icons[milestone.icon as keyof typeof icons], {
                   className: `h-6 w-6 ${milestone.completed ? 'text-green-500' : 'text-gray-400'}`,
                 })}
               </div>
