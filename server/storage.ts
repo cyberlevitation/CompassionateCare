@@ -163,17 +163,30 @@ export const storage = {
       console.log("Creating appointment in storage:", appointment);
       
       // Make sure we have the required fields
-      const appointmentData = {
+      // Parse the date properly to avoid errors
+      let parsedDate: Date;
+      try {
+        if (typeof appointment.date === 'string') {
+          parsedDate = new Date(appointment.date);
+        } else {
+          parsedDate = appointment.date;
+        }
+      } catch (error) {
+        console.error("Error parsing date:", error);
+        parsedDate = new Date();
+      }
+      
+      const appointmentData: InsertAppointment = {
         userId: appointment.userId,
-        date: appointment.date,
+        date: parsedDate,
         appointmentType: appointment.appointmentType,
         duration: appointment.duration || 60,
         location: appointment.location,
         status: appointment.status || 'scheduled',
         notes: appointment.notes || '',
         careProviderId: appointment.careProviderId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       
       const [newAppointment] = await db.insert(appointments).values(appointmentData).returning();

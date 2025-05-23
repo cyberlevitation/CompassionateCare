@@ -48,7 +48,7 @@ export default function CareJourneyTimeline() {
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Fetch user's care journey from the API
-  const { data: careJourney, isLoading } = useQuery<CareJourney>({
+  const { data: careJourney, isLoading, refetch } = useQuery<CareJourney>({
     queryKey: ['/api/care-journey'],
     queryFn: getQueryFn({ on401: 'returnNull' }),
     enabled: !!user,
@@ -149,13 +149,77 @@ export default function CareJourneyTimeline() {
     }, 4000);
   };
 
-  // Show milestone details when clicked
+  // Show milestone details when clicked and allow completion
   const handleMilestoneClick = (milestone: Milestone) => {
     setActiveMilestone(milestone);
     
-    // If this is a celebration milestone and it's completed, trigger the celebration
-    if (milestone.celebration && milestone.completed) {
-      triggerCelebration();
+    // If the milestone is already active, toggle its completion status
+    if (activeMilestone?.id === milestone.id && !milestone.completed) {
+      if (window.confirm(`Mark "${milestone.title}" as completed?`)) {
+        // Create an updated copy of the milestones
+        const updatedMilestones = journey.milestones.map(m => {
+          if (m.id === milestone.id) {
+            return { ...m, completed: true };
+          }
+          return m;
+        });
+        
+        // Update our local state with the updated milestone list
+        if (setJourney) {
+          setJourney({
+            ...journey,
+            milestones: updatedMilestones
+          });
+        }
+        
+        // Show success toast
+        toast({
+          title: "Milestone completed!",
+          description: `You've completed "${milestone.title}"`,
+        });
+        
+        // Update the milestone in the database
+        fetch(`/api/care-journey/milestones/${milestone.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            completed: true
+          })
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Failed to update milestone');
+          }
+          return response.json();
+        })
+        .then(() => {
+          // Trigger celebration effect if this is a celebration milestone
+          if (milestone.celebration) {
+            triggerCelebration();
+          }
+          
+          // Refresh the data if we have a refetch method
+          if (typeof refetch === 'function') {
+            refetch();
+          }
+        })
+        .catch(error => {
+          console.error("Error updating milestone:", error);
+          // Show error toast
+          toast({
+            title: "Error",
+            description: "Failed to update milestone. Please try again.",
+            variant: "destructive",
+          });
+        });
+      }
+    } else {
+      // If this is a celebration milestone and it's completed, trigger the celebration
+      if (milestone.celebration && milestone.completed) {
+        triggerCelebration();
+      }
     }
   };
 
