@@ -5,32 +5,32 @@
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 210 40% 98%;
+    --foreground: 0 0% 12%; /* Darker text for better contrast on light backgrounds */
     
     --card: 0 0% 100%;
-    --card-foreground: 210 40% 98%;
+    --card-foreground: 0 0% 12%; /* Darker text for cards */
     
     --popover: 0 0% 100%;
-    --popover-foreground: 210 40% 98%;
+    --popover-foreground: 0 0% 12%; /* Darker text for popovers */
     
     --primary: 357 93% 46%; /* #e30613 - Super Health Care red */
-    --primary-foreground: 210 40% 98%;
+    --primary-foreground: 0 0% 100%; /* Pure white for text on red */
     
     --secondary: 0 0% 20%; /* #333333 - Super Health Care dark gray */
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 0 0% 100%; /* White text on dark gray */
     
     --accent: 357 93% 36%; /* #b50510 - Super Health Care darker red */
-    --accent-foreground: 210 40% 98%;
+    --accent-foreground: 0 0% 100%; /* White text on accent */
 
     --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted-foreground: 0 0% 40%; /* Darker muted text for better contrast */
     
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84.2% 40%; /* Darker red for better contrast */
+    --destructive-foreground: 0 0% 100%; /* White text on destructive */
 
-    --border: 214.3 31.8% 91.4%;
+    --border: 214.3 31.8% 80%; /* Darker border for better visibility */
     --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
+    --ring: 357 93% 46%; /* Match primary color */
     
     --radius: 0.5rem;
 
@@ -52,32 +52,32 @@
  
   .dark {
     --background: 0 0% 10%;
-    --foreground: 210 40% 98%;
+    --foreground: 0 0% 95%; /* Lighter text for better contrast */
     
     --card: 0 0% 13%;
-    --card-foreground: 210 40% 98%;
+    --card-foreground: 0 0% 95%; /* Lighter text for better contrast */
     
     --popover: 0 0% 13%;
-    --popover-foreground: 210 40% 98%;
+    --popover-foreground: 0 0% 95%; /* Lighter text for better contrast */
     
-    --primary: 357 93% 46%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 357 93% 50%; /* Slightly brighter red for dark mode visibility */
+    --primary-foreground: 0 0% 100%; /* White text on primary */
     
     --secondary: 0 0% 25%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 0 0% 95%; /* Lighter text for better contrast */
     
     --muted: 0 0% 20%;
-    --muted-foreground: 215 20.2% 75%;
+    --muted-foreground: 215 20.2% 85%; /* Lighter muted text for better contrast */
     
-    --accent: 357 93% 36%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 357 93% 50%; /* Slightly brighter accent */
+    --accent-foreground: 0 0% 100%; /* White text on accent */
     
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 50%; /* Brighter destructive color for visibility */
+    --destructive-foreground: 0 0% 100%; /* White text on destructive */
     
-    --border: 0 0% 25%;
+    --border: 0 0% 35%; /* Lighter borders for visibility */
     --input: 0 0% 25%;
-    --ring: 357 93% 46%;
+    --ring: 357 93% 50%; /* Match primary */
   }
 }
 
