@@ -47,26 +47,40 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
   const onSubmit = async (data: SignupFormValues) => {
     setIsLoading(true);
     try {
-      await signup(data.email, data.password, data.name);
-      toast({
-        title: "Account created successfully!",
-        description: "Welcome to Super Health Care",
-        variant: "default",
-        className: "bg-green-50 border-green-200 text-green-800",
-      });
-      if (onSuccess) onSuccess();
+      // Try to sign up
+      const result = await signup(data.email, data.password, data.name);
+      
+      // Only show success if we got a valid result
+      if (result) {
+        toast({
+          title: "Account created successfully!",
+          description: "Welcome to Super Health Care",
+          variant: "default",
+          className: "bg-green-50 border-green-200 text-green-800",
+        });
+        if (onSuccess) onSuccess();
+      }
     } catch (error: any) {
       console.error("Signup error:", error);
       
       // Extract specific error message from Firebase errors
       let errorMessage = "There was a problem creating your account. Please try again.";
       
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = "This email is already registered. Please use a different email or try logging in.";
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = "Password is too weak. Please use a stronger password.";
-      } else if (error.code === 'auth/invalid-email') {
-        errorMessage = "The email address is not valid.";
+      // Check for Firebase specific error codes
+      if (error.code) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            errorMessage = "This email is already registered. Please use a different email or try logging in instead.";
+            break;
+          case 'auth/weak-password':
+            errorMessage = "Password is too weak. Please use a stronger password.";
+            break;
+          case 'auth/invalid-email':
+            errorMessage = "The email address is not valid.";
+            break;
+          default:
+            errorMessage = error.message || errorMessage;
+        }
       } else if (error.message) {
         errorMessage = error.message;
       }

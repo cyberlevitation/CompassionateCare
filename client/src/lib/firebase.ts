@@ -52,19 +52,25 @@ export const signUpWithEmail = async (
   } catch (error: any) {
     console.error("Error signing up with email:", error);
     
-    // Throw specific error messages based on Firebase error codes
+    // Create a new error object with the code property preserved
+    const customError = new Error('Authentication failed');
+    customError.code = error.code;
+    
+    // Add a user-friendly message property
     if (error.code === 'auth/email-already-in-use') {
-      throw new Error('This email is already registered. Please use a different email or log in instead.');
+      customError.message = 'This email is already registered. Please use a different email or try logging in instead.';
     } else if (error.code === 'auth/weak-password') {
-      throw new Error('Password is too weak. Please use a stronger password.');
+      customError.message = 'Password is too weak. Please use a stronger password.';
     } else if (error.code === 'auth/invalid-email') {
-      throw new Error('The email address is not valid.');
+      customError.message = 'The email address is not valid.';
     } else if (error.code === 'auth/operation-not-allowed') {
-      throw new Error('Email/password accounts are not enabled. Please contact support.');
+      customError.message = 'Email/password accounts are not enabled. Please contact support.';
+    } else {
+      customError.message = error.message || 'An unexpected error occurred during signup.';
     }
     
-    // Re-throw the original error if it's not a specific case we handle
-    throw error;
+    // Throw the enhanced error
+    throw customError;
   }
 };
 
