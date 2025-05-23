@@ -110,7 +110,8 @@ const appointmentFormSchema = z.object({
 });
 
 export default function BookAppointment() {
-  const { user, isLoading, isAuthenticated } = useAuth();
+  const { user, isProfileLoading, currentUser } = useAuth();
+  const isAuthenticated = !!currentUser;
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -164,14 +165,10 @@ export default function BookAppointment() {
   // Mutation for creating appointments
   const appointmentMutation = useMutation({
     mutationFn: async (data: any) => {
-      // Add auth token to the request
-      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
-      const headers = token ? { Authorization: `Bearer ${token}` } : {};
-      
       // Add extra debugging for troubleshooting
-      console.log("Submitting appointment with token:", !!token);
+      console.log("Submitting appointment data:", data);
       
-      return await apiRequest("POST", "/api/appointments", data, headers);
+      return await apiRequest("POST", "/api/appointments", data);
     },
     onSuccess: () => {
       toast({
