@@ -69,6 +69,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         toast({
           title: "Login successful",
           description: `Welcome${user.displayName ? ', ' + user.displayName.split(' ')[0] : ''}!`,
+          variant: "default",
+          className: "bg-green-50 border-green-200 text-green-800",
         });
         // Redirect to dashboard after successful login
         window.location.href = '/dashboard';
@@ -78,6 +80,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           title: "Login failed",
           description: "There was a problem logging in. Please check your email and password.",
           variant: "destructive",
+          className: "bg-red-50 border-red-200 text-red-800",
         });
         return null;
       }
@@ -87,6 +90,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: "Login error",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
       });
       return null;
     } finally {
@@ -103,6 +107,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         toast({
           title: "Sign up successful",
           description: `Welcome to Super Health Care, ${displayName}!`,
+          variant: "default", 
+          className: "bg-green-50 border-green-200 text-green-800",
         });
         return user;
       } else {
@@ -110,6 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           title: "Sign up failed",
           description: "There was a problem creating your account. Please try again.",
           variant: "destructive",
+          className: "bg-red-50 border-red-200 text-red-800",
         });
         return null;
       }
@@ -119,6 +126,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: "Sign up error",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
       });
       return null;
     } finally {
@@ -133,6 +141,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       toast({
         title: "Logged out",
         description: "You have been successfully logged out.",
+        variant: "default",
+        className: "bg-blue-50 border-blue-200 text-blue-800",
       });
       queryClient.clear();
     } catch (error) {
@@ -141,6 +151,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         title: "Logout error",
         description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
+        className: "bg-red-50 border-red-200 text-red-800",
       });
     }
   };
