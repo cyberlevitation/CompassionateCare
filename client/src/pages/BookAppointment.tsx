@@ -246,9 +246,17 @@ export default function BookAppointment() {
     
     // Prepare data for API
     const appointmentData = {
-      ...data,
+      userId: currentUser?.uid, // Make sure we include the user ID
+      appointmentType: data.appointmentType,
+      careProviderId: data.careProviderId,
+      duration: data.duration,
+      location: data.location,
+      notes: data.notes || "",
+      status: "scheduled", // Set initial status
       date: appointmentDate.toISOString(),
     };
+    
+    console.log("Submitting appointment data:", appointmentData);
     
     // Submit data to API
     appointmentMutation.mutate(appointmentData);
