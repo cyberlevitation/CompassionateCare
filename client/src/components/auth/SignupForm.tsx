@@ -58,7 +58,14 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
           variant: "default",
           className: "bg-green-50 border-green-200 text-green-800",
         });
+        
+        // Close the dialog if onSuccess is provided
         if (onSuccess) onSuccess();
+        
+        // Redirect to dashboard after successful signup
+        setTimeout(() => {
+          window.location.href = '/dashboard';
+        }, 1000); // Short delay to allow toast to be seen
       }
     } catch (error: any) {
       console.error("Signup error:", error);
