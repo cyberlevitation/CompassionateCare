@@ -13,16 +13,30 @@ import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
 import nodemailer from "nodemailer";
 import type { Response, Request } from "express";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { isAuthenticated } from "./firebaseAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
+  // Express session setup for basic state management
+  app.use(function(req, res, next) {
+    // CORS headers for API endpoints
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
+    
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
+    }
+    next();
+  });
 
-  // Auth routes
-  app.get("/api/auth/user", isAuthenticated, async (req: any, res) => {
+  // Auth routes for Firebase authentication
+  app.get("/api/auth/user", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
+      const userId = req.user.uid;
       const user = await storage.getUser(userId);
       res.json(user);
     } catch (error) {
