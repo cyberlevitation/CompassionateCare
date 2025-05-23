@@ -5,14 +5,6 @@ import {
   integer,
   boolean,
   timestamp,
-} from "drizzle-orm/pg-core";
-import {
-  pgTable,
-  text,
-  serial,
-  integer,
-  boolean,
-  timestamp,
   json,
   varchar,
   jsonb,
@@ -21,7 +13,8 @@ import {
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Session storage table for Replit Auth
+// Session table is kept for backwards compatibility
+// This can be removed if not needed for your Firebase implementation
 export const sessions = pgTable(
   "sessions",
   {
@@ -32,7 +25,7 @@ export const sessions = pgTable(
   (table) => [index("IDX_session_expire").on(table.expire)]
 );
 
-// Users table for Replit Auth
+// Users table - now used for Firebase Auth
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().notNull(),
   email: varchar("email").unique(),
