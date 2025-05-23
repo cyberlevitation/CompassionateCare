@@ -121,10 +121,10 @@ export default function BookAppointment() {
 
   // Redirect to login if not authenticated
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      setLocation("/api/login");
+    if (!isProfileLoading && !isAuthenticated) {
+      setLocation("/login");
     }
-  }, [isAuthenticated, isLoading, setLocation]);
+  }, [isAuthenticated, isProfileLoading, setLocation]);
 
   // Fetch care providers
   const { 
@@ -208,7 +208,7 @@ export default function BookAppointment() {
     appointmentMutation.mutate(appointmentData);
   };
 
-  if (isLoading) {
+  if (isProfileLoading) {
     return (
       <div className="pt-24 min-h-screen flex items-center justify-center">
         <div className="animate-pulse flex flex-col items-center">
