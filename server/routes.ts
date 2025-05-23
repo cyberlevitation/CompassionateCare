@@ -8,6 +8,8 @@ import {
   type InsertBooking,
   jobApplicationSchema,
   type InsertJobApplication,
+  careJourneys,
+  careJourneyMilestones,
 } from "@shared/schema";
 import { ZodError } from "zod";
 import { fromZodError } from "zod-validation-error";
@@ -609,6 +611,118 @@ export async function registerRoutes(app: Express): Promise<Server> {
         success: false,
         message: "An error occurred while processing your application",
       });
+    }
+  });
+
+  // Care Journey API endpoints
+  app.get("/api/care-journey", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const userId = req.user.uid;
+      console.log("Getting care journey for user:", userId);
+      
+      // Get the user's care journey
+      const journey = await storage.getCareJourney(userId);
+      
+      if (journey) {
+        console.log("Found existing care journey");
+        res.json(journey);
+      } else {
+        console.log("Creating new care journey for user");
+        // Create a default journey for new users
+        const defaultJourney = {
+          userId,
+          startDate: new Date().toISOString(),
+          currentPhase: "Initial Assessment",
+          milestones: [
+            {
+              type: "appointment",
+              title: "Initial Consultation",
+              description: "Your first meeting with our care team to discuss your needs.",
+              date: new Date().toISOString(),
+              completed: true,
+              icon: "appointment",
+              celebration: true
+            },
+            {
+              type: "assessment",
+              title: "Care Assessment",
+              description: "Comprehensive evaluation of your care requirements.",
+              date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+              completed: false,
+              icon: "assessment"
+            },
+            {
+              type: "goal",
+              title: "Care Plan Creation",
+              description: "Development of your personalized care plan.",
+              date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+              completed: false,
+              icon: "goal"
+            },
+            {
+              type: "achievement",
+              title: "First Month Milestone",
+              description: "Celebrating one month of successful care service.",
+              date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              completed: false,
+              icon: "achievement",
+              celebration: true
+            }
+          ]
+        };
+        
+        // Save the default journey
+        try {
+          const newJourney = await storage.createCareJourney(defaultJourney);
+          res.json(newJourney);
+        } catch (createError) {
+          console.error("Error creating default care journey:", createError);
+          // Return the default journey even if saving fails
+          res.json(defaultJourney);
+        }
+      }
+    } catch (error) {
+      console.error("Error handling care journey request:", error);
+      res.status(500).json({ message: "Failed to process care journey request" });
+    }
+  });
+  
+  // Update a milestone in the care journey
+  app.patch("/api/care-journey/milestones/:id", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+      
+      const userId = req.user.uid;
+      const milestoneId = parseInt(req.params.id);
+      
+      console.log(`Updating milestone ${milestoneId} for user ${userId}`);
+      
+      // Get the user's care journey
+      const journey = await storage.getCareJourney(userId);
+      
+      if (!journey) {
+        return res.status(404).json({ message: "Care journey not found" });
+      }
+      
+      // Update the milestone
+      const result = await storage.updateCareJourneyMilestone(milestoneId, req.body);
+      
+      if (result) {
+        // Fetch the updated journey to return the complete data
+        const updatedJourney = await storage.getCareJourney(userId);
+        res.json(updatedJourney);
+      } else {
+        res.status(404).json({ message: "Milestone not found" });
+      }
+    } catch (error) {
+      console.error("Error updating milestone:", error);
+      res.status(500).json({ message: "Failed to update milestone" });
     }
   });
 

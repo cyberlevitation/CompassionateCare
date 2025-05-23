@@ -20,7 +20,13 @@ import {
   type Appointment,
   careProviders,
   type InsertCareProvider,
-  type CareProvider
+  type CareProvider,
+  careJourneys,
+  careJourneyMilestones,
+  type CareJourney,
+  type InsertCareJourney,
+  type CareJourneyMilestone,
+  type InsertCareJourneyMilestone
 } from "@shared/schema";
 import { eq, desc, and, gte, lte } from "drizzle-orm";
 

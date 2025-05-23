@@ -1,0 +1,24 @@
+import { db } from "@db";
+import {
+  contacts,
+  type InsertContact,
+  type Contact,
+  bookings,
+  type InsertBooking,
+  type Booking,
+  jobApplications,
+  type InsertJobApplication,
+  type JobApplication,
+  detailedApplications,
+--
+import { eq, desc, and, gte, lte } from "drizzle-orm";
+
+interface CareJourneyWithMilestones {
+  id: number;
+  userId: string;
+  startDate: Date | string;
+  currentPhase: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  milestones: Array<{
+    id: number;
