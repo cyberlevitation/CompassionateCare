@@ -60,16 +60,21 @@ export const isAuthenticated: RequestHandler = async (req: Request, res: Respons
     };
     
     // Check if user exists in database, if not create them
-    const existingUser = await storage.getUser(userId);
-    
-    if (!existingUser) {
-      await storage.upsertUser({
-        id: userId,
-        email: req.user.email,
-        firstName: req.user.displayName,
-        lastName: '',
-        profileImageUrl: '',
-      });
+    try {
+      const existingUser = await storage.getUser(userId);
+      
+      if (!existingUser) {
+        await storage.upsertUser({
+          id: userId,
+          email: req.user.email,
+          firstName: req.user.displayName,
+          lastName: '',
+          profileImageUrl: '',
+        });
+      }
+    } catch (error) {
+      console.log("Note: User check skipped:", error);
+      // Continue anyway - this may happen during development
     }
     
     // Continue to the protected route

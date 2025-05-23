@@ -77,18 +77,18 @@ const UserSidebar = () => {
         
         <nav className="space-y-1">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href}>
-              <a
-                className={cn(
-                  "flex items-center px-3 py-2 text-sm font-medium rounded-md w-full transition-colors",
-                  location === item.href
-                    ? "bg-primary/10 text-primary"
-                    : "text-gray-700 hover:bg-gray-100"
-                )}
-              >
-                {item.icon}
-                {item.name}
-              </a>
+            <Link 
+              key={item.href} 
+              href={item.href}
+              className={cn(
+                "flex items-center px-3 py-2 text-sm font-medium rounded-md w-full transition-colors",
+                location === item.href
+                  ? "bg-primary/10 text-primary"
+                  : "text-gray-700 hover:bg-gray-100"
+              )}
+            >
+              {item.icon}
+              {item.name}
             </Link>
           ))}
         </nav>
