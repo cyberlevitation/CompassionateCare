@@ -58,8 +58,18 @@ const SignupForm = ({ onSuccess }: { onSuccess?: () => void }) => {
     } catch (error: any) {
       console.error("Signup error:", error);
       
-      // Display a friendly error message based on the error
-      const errorMessage = error.message || "There was a problem creating your account. Please try again.";
+      // Extract specific error message from Firebase errors
+      let errorMessage = "There was a problem creating your account. Please try again.";
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "This email is already registered. Please use a different email or try logging in.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Password is too weak. Please use a stronger password.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "The email address is not valid.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
       
       toast({
         title: "Signup failed",

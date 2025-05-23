@@ -120,11 +120,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         });
         return null;
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Signup error:", error);
+      
+      // Extract specific error message from Firebase errors
+      let errorMessage = "An unexpected error occurred. Please try again.";
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "This email is already registered. Please use a different email or try logging in.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "Password is too weak. Please use a stronger password.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "The email address is not valid.";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
       toast({
         title: "Sign up error",
-        description: "An unexpected error occurred. Please try again.",
+        description: errorMessage,
         variant: "destructive",
         className: "bg-red-50 border-red-200 text-red-800",
       });
