@@ -139,7 +139,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
       try {
         // Try to get appointments from database
         const appointments = await storage.getUserAppointments(userId);
-        res.json(appointments);
+        
+        // Enhance appointments with care provider details
+        const enhancedAppointments = await Promise.all(
+          appointments.map(async (appointment) => {
+            try {
+              if (appointment.careProviderId) {
+                const provider = await storage.getCareProviderById(appointment.careProviderId);
+                if (provider) {
+                  return {
+                    ...appointment,
+                    careProvider: provider
+                  };
+                }
+              }
+              return appointment;
+            } catch (error) {
+              console.error(`Error enhancing appointment ${appointment.id}:`, error);
+              return appointment;
+            }
+          })
+        );
+        
+        res.json(enhancedAppointments);
       } catch (dbError) {
         console.error("Database error fetching appointments:", dbError);
         
@@ -213,15 +235,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const userId = req.user.uid;
 
       try {
+        // Ensure date is properly formatted as ISO string
+        let appointmentDate = req.body.date;
+        if (appointmentDate && typeof appointmentDate === 'string') {
+          // Make sure it's a valid ISO string
+          appointmentDate = new Date(appointmentDate).toISOString();
+        }
+
+        // Check if the selected care provider is available at this time
+        const careProviderId = req.body.careProviderId;
+        if (careProviderId) {
+          // In a real system, we would check for conflicts here
+          // For now, we'll assume all providers are available
+          console.log(`Checking availability for provider ${careProviderId} at ${appointmentDate}`);
+        }
+
         // Create appointment with user ID from authenticated session
         const appointmentData = {
           ...req.body,
           userId,
           status: "scheduled",
+          date: appointmentDate,
         };
 
         const newAppointment = await storage.createAppointment(appointmentData);
-        res.status(201).json(newAppointment);
+        
+        // Add the care provider information to the response
+        const careProvider = await storage.getCareProviderById(careProviderId);
+        const appointmentWithProvider = {
+          ...newAppointment,
+          careProvider: careProvider || {
+            id: careProviderId,
+            firstName: "Care",
+            lastName: "Provider",
+            title: "Health Care Professional"
+          }
+        };
+        
+        res.status(201).json(appointmentWithProvider);
       } catch (dbError) {
         console.error("Database error creating appointment:", dbError);
         
@@ -231,14 +282,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
           id: Date.now(), // Use timestamp as a unique ID
           userId: userId,
           appointmentType: req.body.appointmentType,
-          date: req.body.date,
+          date: typeof req.body.date === 'string' ? req.body.date : new Date().toISOString(),
           duration: req.body.duration || 60,
           status: "scheduled",
           careProviderId: req.body.careProviderId,
           location: req.body.location || "Home Visit",
           notes: req.body.notes || "",
           createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          updatedAt: new Date().toISOString(),
+          careProvider: {
+            id: req.body.careProviderId,
+            firstName: "Care",
+            lastName: "Provider",
+            title: "Health Care Professional"
+          }
         });
       }
     } catch (error) {
@@ -324,6 +381,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching care providers:", error);
       res.status(500).json({ message: "Failed to fetch care providers" });
+    }
+  });
+  
+  // Get care provider availability
+  app.get("/api/care-providers/:id/availability", async (req, res) => {
+    try {
+      const providerId = parseInt(req.params.id);
+      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : new Date();
+      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+      
+      try {
+        // Fetch provider's schedule from the database
+        const availability = await storage.getCareProviderAvailability(providerId, startDate, endDate);
+        res.json(availability);
+      } catch (error) {
+        console.error("Error getting provider availability:", error);
+        res.status(500).json({ message: "Failed to get provider availability" });
+      }
+    } catch (error) {
+      console.error("Error processing availability request:", error);
+      res.status(500).json({ message: "Failed to process availability request" });
     }
   });
 

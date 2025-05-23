@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, Link } from "wouter";
 import { Helmet } from "react-helmet";
 import { useAuth } from "@/hooks/useAuth";
 import { PageTransition } from "@/lib/transitions";

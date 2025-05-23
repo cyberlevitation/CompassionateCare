@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
-import { useAuth } from "@/contexts/AuthContext";
+import { useAuth } from "@/hooks/useAuth";
 import UserLayout from "@/components/UserLayout";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin } from "lucide-react";
@@ -58,7 +58,7 @@ interface Appointment {
 }
 
 export default function Appointments() {
-  const { currentUser } = useAuth();
+  const { user, currentUser } = useAuth();
   const { toast } = useToast();
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
 
@@ -66,7 +66,7 @@ export default function Appointments() {
   const { data: appointments, isLoading } = useQuery({
     queryKey: ["/api/appointments"],
     queryFn: getQueryFn({ on401: "returnNull" }),
-    enabled: !!currentUser,
+    enabled: !!(currentUser || user), // Support both authentication methods
   });
 
   const formatDate = (dateString: string) => {
