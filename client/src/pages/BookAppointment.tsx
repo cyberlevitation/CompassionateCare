@@ -164,7 +164,14 @@ export default function BookAppointment() {
   // Mutation for creating appointments
   const appointmentMutation = useMutation({
     mutationFn: async (data: any) => {
-      return await apiRequest("POST", "/api/appointments", data);
+      // Add auth token to the request
+      const token = auth.currentUser ? await auth.currentUser.getIdToken() : null;
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      
+      // Add extra debugging for troubleshooting
+      console.log("Submitting appointment with token:", !!token);
+      
+      return await apiRequest("POST", "/api/appointments", data, headers);
     },
     onSuccess: () => {
       toast({
@@ -178,6 +185,7 @@ export default function BookAppointment() {
       setLocation("/dashboard");
     },
     onError: (error) => {
+      console.error("Appointment booking error:", error);
       toast({
         title: "Scheduling Failed",
         description: error instanceof Error ? error.message : "Please try again later.",

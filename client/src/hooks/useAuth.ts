@@ -39,12 +39,23 @@ export function useAuth() {
     enabled: !!auth.currentUser, // Only query if Firebase shows the user is authenticated
   });
 
+  // For backward compatibility with the existing code that expects this structure
+  const user = userProfile || (auth.currentUser ? {
+    id: auth.currentUser.uid,
+    email: auth.currentUser.email || undefined,
+    firstName: auth.currentUser.displayName?.split(' ')[0] || undefined,
+    lastName: auth.currentUser.displayName?.split(' ').slice(1).join(' ') || undefined,
+    profileImageUrl: auth.currentUser.photoURL || undefined,
+  } : null);
+
   return {
     // Include all Firebase auth properties
     ...auth,
     
-    // Also include the database user profile
-    user: userProfile,
+    // Provide a consistent user object that combines Firebase auth with backend profile
+    user,
     isProfileLoading,
+    // isAuthenticated is true if we have a current user from Firebase auth
+    isAuthenticated: !!auth.currentUser,
   };
 }

@@ -53,7 +53,7 @@ export const signUpWithEmail = async (
     console.error("Error signing up with email:", error);
     
     // Create a new error object with the code property preserved
-    const customError = new Error('Authentication failed');
+    const customError: any = new Error('Authentication failed');
     customError.code = error.code;
     
     // Add a user-friendly message property
