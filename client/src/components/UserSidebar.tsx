@@ -7,7 +7,8 @@ import {
   Settings, 
   FileText, 
   LogOut,
-  User
+  User,
+  Heart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,6 +33,11 @@ const UserSidebar = () => {
       name: "Book Appointment",
       href: "/book-appointment",
       icon: <FileText className="w-5 h-5 mr-3" />,
+    },
+    {
+      name: "Care Journey",
+      href: "/care-journey",
+      icon: <Heart className="w-5 h-5 mr-3" />,
     },
     {
       name: "Account Settings",

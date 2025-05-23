@@ -61,6 +61,7 @@ function Router() {
           <Route path="/account-settings" component={AccountSettings} />
           <Route path="/book-appointment" component={BookAppointment} />
           <Route path="/appointments" component={Appointments} />
+          <Route path="/care-journey" component={CareJourney} />
           <Route component={NotFound} />
         </Switch>
       </PageTransition>
