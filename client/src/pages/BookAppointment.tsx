@@ -120,6 +120,15 @@ export default function BookAppointment() {
   const [selectedProvider, setSelectedProvider] = useState<CareProvider | null>(null);
   const [providerAvailability, setProviderAvailability] = useState<{date: string, available: boolean}[]>([]);
   const [availableTimes, setAvailableTimes] = useState<string[]>(timeSlots);
+  
+  // Ensure we always have time slots available
+  useEffect(() => {
+    // Initialize with default time slots if the available times array is empty
+    if (!availableTimes || availableTimes.length === 0) {
+      console.log("Initializing default time slots");
+      setAvailableTimes(timeSlots);
+    }
+  }, [availableTimes]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
