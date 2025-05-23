@@ -46,9 +46,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User profile update endpoint
-  app.patch("/api/user/profile", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/user/profile", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
+      const userId = req.user.uid;
       const currentUser = await storage.getUser(userId);
 
       if (!currentUser) {
@@ -75,9 +79,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // User preferences update endpoint
-  app.patch("/api/user/preferences", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/user/preferences", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
+      const userId = req.user.uid;
       const currentUser = await storage.getUser(userId);
 
       if (!currentUser) {
@@ -109,9 +117,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Appointment API endpoints
 
   // Get all appointments for current user
-  app.get("/api/appointments", isAuthenticated, async (req: any, res) => {
+  app.get("/api/appointments", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
+      const userId = req.user.uid;
       const appointments = await storage.getUserAppointments(userId);
       res.json(appointments);
     } catch (error) {
@@ -124,9 +136,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get(
     "/api/appointments/upcoming",
     isAuthenticated,
-    async (req: any, res) => {
+    async (req, res) => {
       try {
-        const userId = req.user.claims.sub;
+        if (!req.user || !req.user.uid) {
+          return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        }
+        
+        const userId = req.user.uid;
         const appointments = await storage.getUpcomingUserAppointments(userId);
         res.json(appointments);
       } catch (error) {
@@ -139,8 +155,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Get specific appointment
-  app.get("/api/appointments/:id", isAuthenticated, async (req: any, res) => {
+  app.get("/api/appointments/:id", isAuthenticated, async (req, res) => {
     try {
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
       const appointmentId = parseInt(req.params.id);
       const appointment = await storage.getAppointmentById(appointmentId);
 
@@ -149,7 +169,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Ensure user can only access their own appointments
-      if (appointment.userId !== req.user.claims.sub) {
+      if (appointment.userId !== req.user.uid) {
         return res
           .status(403)
           .json({ message: "Unauthorized access to appointment" });
@@ -163,9 +183,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new appointment
-  app.post("/api/appointments", isAuthenticated, async (req: any, res) => {
+  app.post("/api/appointments", isAuthenticated, async (req, res) => {
     try {
-      const userId = req.user.claims.sub;
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
+      const userId = req.user.uid;
 
       // Create appointment with user ID from authenticated session
       const appointmentData = {
@@ -183,8 +207,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update appointment
-  app.patch("/api/appointments/:id", isAuthenticated, async (req: any, res) => {
+  app.patch("/api/appointments/:id", isAuthenticated, async (req, res) => {
     try {
+      if (!req.user || !req.user.uid) {
+        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+      }
+      
       const appointmentId = parseInt(req.params.id);
       const appointment = await storage.getAppointmentById(appointmentId);
 
@@ -193,7 +221,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Ensure user can only update their own appointments
-      if (appointment.userId !== req.user.claims.sub) {
+      if (appointment.userId !== req.user.uid) {
         return res
           .status(403)
           .json({ message: "Unauthorized access to appointment" });
@@ -214,8 +242,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post(
     "/api/appointments/:id/cancel",
     isAuthenticated,
-    async (req: any, res) => {
+    async (req, res) => {
       try {
+        if (!req.user || !req.user.uid) {
+          return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        }
+        
         const appointmentId = parseInt(req.params.id);
         const appointment = await storage.getAppointmentById(appointmentId);
 
@@ -224,7 +256,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Ensure user can only cancel their own appointments
-        if (appointment.userId !== req.user.claims.sub) {
+        if (appointment.userId !== req.user.uid) {
           return res
             .status(403)
             .json({ message: "Unauthorized access to appointment" });
