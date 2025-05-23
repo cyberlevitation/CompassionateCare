@@ -156,22 +156,6 @@ export default function CareJourneyTimeline() {
     // If the milestone is already active, toggle its completion status
     if (activeMilestone?.id === milestone.id && !milestone.completed) {
       if (window.confirm(`Mark "${milestone.title}" as completed?`)) {
-        // Create an updated copy of the milestones
-        const updatedMilestones = journey.milestones.map(m => {
-          if (m.id === milestone.id) {
-            return { ...m, completed: true };
-          }
-          return m;
-        });
-        
-        // Update our local state with the updated milestone list
-        if (setJourney) {
-          setJourney({
-            ...journey,
-            milestones: updatedMilestones
-          });
-        }
-        
         // Show success toast
         toast({
           title: "Milestone completed!",
@@ -200,10 +184,8 @@ export default function CareJourneyTimeline() {
             triggerCelebration();
           }
           
-          // Refresh the data if we have a refetch method
-          if (typeof refetch === 'function') {
-            refetch();
-          }
+          // Refresh the data
+          refetch();
         })
         .catch(error => {
           console.error("Error updating milestone:", error);
