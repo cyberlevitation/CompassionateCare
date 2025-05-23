@@ -24,6 +24,25 @@ import {
 } from "@shared/schema";
 import { eq, desc, and, gte, lte } from "drizzle-orm";
 
+interface CareJourneyWithMilestones {
+  id: number;
+  userId: string;
+  startDate: Date | string;
+  currentPhase: string;
+  createdAt?: Date | string;
+  updatedAt?: Date | string;
+  milestones: Array<{
+    id: number;
+    type: string;
+    title: string;
+    description: string;
+    date: Date | string;
+    completed: boolean;
+    icon: string;
+    celebration?: boolean;
+  }>;
+}
+
 export const storage = {
   // User operations for Replit Auth
   async getUser(id: string): Promise<User | undefined> {
@@ -232,5 +251,57 @@ export const storage = {
     }
     
     return availability;
+  },
+
+  // Care Journey operations 
+  async getCareJourney(userId: string): Promise<CareJourneyWithMilestones | null> {
+    try {
+      // For now, return null to create a new journey each time
+      // In a production app, we would query the database
+      return null;
+    } catch (error) {
+      console.error("Error fetching care journey:", error);
+      return null;
+    }
+  },
+  
+  async createCareJourney(data: any): Promise<CareJourneyWithMilestones> {
+    // Since we don't have the database tables set up yet, simply return the data
+    return {
+      id: Math.floor(Math.random() * 1000),
+      userId: data.userId,
+      startDate: data.startDate || new Date().toISOString(),
+      currentPhase: data.currentPhase || 'Initial Assessment',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      milestones: data.milestones || []
+    };
+  },
+  
+  async updateCareJourney(userId: string, data: any): Promise<CareJourneyWithMilestones | null> {
+    try {
+      // Since we don't have the database tables set up yet, simply return the data
+      return {
+        id: data.id || Math.floor(Math.random() * 1000),
+        userId: userId,
+        startDate: data.startDate || new Date().toISOString(),
+        currentPhase: data.currentPhase || 'Initial Assessment',
+        createdAt: data.createdAt || new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        milestones: data.milestones || []
+      };
+    } catch (error) {
+      console.error("Error updating care journey:", error);
+      return null;
+    }
+  },
+  
+  async updateCareJourneyMilestone(milestoneId: number, data: any): Promise<any> {
+    // Since we don't have the database tables set up yet, simply return the data
+    return {
+      id: milestoneId,
+      ...data,
+      updatedAt: new Date().toISOString()
+    };
   }
 };

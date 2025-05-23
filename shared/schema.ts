@@ -325,3 +325,46 @@ export const careProviderSchema = createInsertSchema(careProviders, {
 
 export type InsertCareProvider = z.infer<typeof careProviderSchema>;
 export type CareProvider = typeof careProviders.$inferSelect;
+
+// Care Journey Schema - For tracking personalized care milestones
+export const careJourneyMilestones = pgTable("care_journey_milestones", {
+  id: serial("id").primaryKey(),
+  journeyId: integer("journey_id").notNull(),
+  type: varchar("type", { length: 50 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description"),
+  date: timestamp("date").notNull(),
+  completed: boolean("completed").default(false),
+  icon: varchar("icon", { length: 50 }).notNull(),
+  celebration: boolean("celebration").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const careJourneys = pgTable("care_journeys", {
+  id: serial("id").primaryKey(),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  startDate: timestamp("start_date").defaultNow(),
+  currentPhase: varchar("current_phase", { length: 100 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const careJourneySchema = createInsertSchema(careJourneys, {
+  userId: (schema) => schema.min(1, "User ID is required"),
+  startDate: (schema) => schema,
+  currentPhase: (schema) => schema.min(1, "Current phase is required"),
+});
+
+export const careJourneyMilestoneSchema = createInsertSchema(careJourneyMilestones, {
+  journeyId: (schema) => schema.positive("Journey ID must be positive"),
+  type: (schema) => schema.min(1, "Type is required"),
+  title: (schema) => schema.min(1, "Title is required"),
+  date: (schema) => schema,
+  icon: (schema) => schema.min(1, "Icon is required"),
+});
+
+export type InsertCareJourney = z.infer<typeof careJourneySchema>;
+export type CareJourney = typeof careJourneys.$inferSelect;
+export type InsertCareJourneyMilestone = z.infer<typeof careJourneyMilestoneSchema>;
+export type CareJourneyMilestone = typeof careJourneyMilestones.$inferSelect;
