@@ -256,9 +256,25 @@ export const storage = {
   // Care Journey operations 
   async getCareJourney(userId: string): Promise<CareJourneyWithMilestones | null> {
     try {
-      // For now, return null to create a new journey each time
-      // In a production app, we would query the database
-      return null;
+      // Get the care journey from the database
+      const [journey] = await db.select().from(careJourneys).where(eq(careJourneys.userId, userId));
+      
+      if (!journey) {
+        return null;
+      }
+      
+      // Get all milestones for this journey
+      const milestones = await db
+        .select()
+        .from(careJourneyMilestones)
+        .where(eq(careJourneyMilestones.careJourneyId, journey.id))
+        .orderBy(careJourneyMilestones.date);
+      
+      // Return the journey with its milestones
+      return {
+        ...journey,
+        milestones
+      };
     } catch (error) {
       console.error("Error fetching care journey:", error);
       return null;
