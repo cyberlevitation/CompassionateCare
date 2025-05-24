@@ -19,13 +19,19 @@ import { isAuthenticated } from "./firebaseAuth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Express session setup for basic state management
-  app.use(function(req, res, next) {
+  app.use(function (req, res, next) {
     // CORS headers for API endpoints
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
-    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS, PATCH");
-    
-    if (req.method === 'OPTIONS') {
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.header(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS, PATCH"
+    );
+
+    if (req.method === "OPTIONS") {
       return res.sendStatus(200);
     }
     next();
@@ -35,22 +41,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/auth/user", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       // Return a basic user profile based on Firebase auth data
       // This avoids the database error we're experiencing
       const userProfile = {
         id: req.user.uid,
-        email: req.user.email || 'user@example.com',
-        firstName: req.user.displayName?.split(' ')[0] || 'User',
-        lastName: req.user.displayName?.split(' ').slice(1).join(' ') || '',
-        profileImageUrl: '',
+        email: req.user.email || "user@example.com",
+        firstName: req.user.displayName?.split(" ")[0] || "User",
+        lastName: req.user.displayName?.split(" ").slice(1).join(" ") || "",
+        profileImageUrl: "",
         preferences: {},
         createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       };
-      
+
       res.json(userProfile);
     } catch (error) {
       console.error("Error handling user data:", error);
@@ -62,9 +70,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/profile", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       const userId = req.user.uid;
       const currentUser = await storage.getUser(userId);
 
@@ -95,9 +105,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/user/preferences", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       const userId = req.user.uid;
       const currentUser = await storage.getUser(userId);
 
@@ -133,40 +145,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/appointments", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       const userId = req.user.uid;
-      
+
       try {
         // Try to get appointments from database
         const appointments = await storage.getUserAppointments(userId);
-        
+
         // Enhance appointments with care provider details
         const enhancedAppointments = await Promise.all(
           appointments.map(async (appointment) => {
             try {
               if (appointment.careProviderId) {
-                const provider = await storage.getCareProviderById(appointment.careProviderId);
+                const provider = await storage.getCareProviderById(
+                  appointment.careProviderId
+                );
                 if (provider) {
                   return {
                     ...appointment,
-                    careProvider: provider
+                    careProvider: provider,
                   };
                 }
               }
               return appointment;
             } catch (error) {
-              console.error(`Error enhancing appointment ${appointment.id}:`, error);
+              console.error(
+                `Error enhancing appointment ${appointment.id}:`,
+                error
+              );
               return appointment;
             }
           })
         );
-        
+
         res.json(enhancedAppointments);
       } catch (dbError) {
         console.error("Database error fetching appointments:", dbError);
-        
+
         // If we can't get from database, return an empty array
         // This allows the UI to show "No appointments" instead of an error
         res.json([]);
@@ -178,34 +197,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get upcoming appointments for current user
-  app.get(
-    "/api/appointments/upcoming",
-    isAuthenticated,
-    async (req, res) => {
-      try {
-        if (!req.user || !req.user.uid) {
-          return res.status(401).json({ message: "Unauthorized - User not authenticated" });
-        }
-        
-        const userId = req.user.uid;
-        const appointments = await storage.getUpcomingUserAppointments(userId);
-        res.json(appointments);
-      } catch (error) {
-        console.error("Error fetching upcoming appointments:", error);
-        res
-          .status(500)
-          .json({ message: "Failed to fetch upcoming appointments" });
+  app.get("/api/appointments/upcoming", isAuthenticated, async (req, res) => {
+    try {
+      if (!req.user || !req.user.uid) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
+
+      const userId = req.user.uid;
+      const appointments = await storage.getUpcomingUserAppointments(userId);
+      res.json(appointments);
+    } catch (error) {
+      console.error("Error fetching upcoming appointments:", error);
+      res
+        .status(500)
+        .json({ message: "Failed to fetch upcoming appointments" });
     }
-  );
+  });
 
   // Get specific appointment
   app.get("/api/appointments/:id", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       const appointmentId = parseInt(req.params.id);
       const appointment = await storage.getAppointmentById(appointmentId);
 
@@ -231,15 +250,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/appointments", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       const userId = req.user.uid;
 
       try {
         // Ensure date is properly formatted as ISO string
         let appointmentDate = req.body.date;
-        if (appointmentDate && typeof appointmentDate === 'string') {
+        if (appointmentDate && typeof appointmentDate === "string") {
           // Make sure it's a valid ISO string
           appointmentDate = new Date(appointmentDate).toISOString();
         }
@@ -249,7 +270,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         if (careProviderId) {
           // In a real system, we would check for conflicts here
           // For now, we'll assume all providers are available
-          console.log(`Checking availability for provider ${careProviderId} at ${appointmentDate}`);
+          console.log(
+            `Checking availability for provider ${careProviderId} at ${appointmentDate}`
+          );
         }
 
         // Create appointment with user ID from authenticated session
@@ -261,7 +284,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
 
         const newAppointment = await storage.createAppointment(appointmentData);
-        
+
         // Add the care provider information to the response
         const careProvider = await storage.getCareProviderById(careProviderId);
         const appointmentWithProvider = {
@@ -270,21 +293,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: careProviderId,
             firstName: "Care",
             lastName: "Provider",
-            title: "Health Care Professional"
-          }
+            title: "Health Care Professional",
+          },
         };
-        
+
         res.status(201).json(appointmentWithProvider);
       } catch (dbError) {
         console.error("Database error creating appointment:", dbError);
-        
+
         // If database operation fails, return a successful response with the data anyway
         // This ensures the UI shows success even if database operations are having issues
         res.status(201).json({
           id: Date.now(), // Use timestamp as a unique ID
           userId: userId,
           appointmentType: req.body.appointmentType,
-          date: typeof req.body.date === 'string' ? req.body.date : new Date().toISOString(),
+          date:
+            typeof req.body.date === "string"
+              ? req.body.date
+              : new Date().toISOString(),
           duration: req.body.duration || 60,
           status: "scheduled",
           careProviderId: req.body.careProviderId,
@@ -296,8 +322,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
             id: req.body.careProviderId,
             firstName: "Care",
             lastName: "Provider",
-            title: "Health Care Professional"
-          }
+            title: "Health Care Professional",
+          },
         });
       }
     } catch (error) {
@@ -310,9 +336,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/appointments/:id", isAuthenticated, async (req, res) => {
     try {
       if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not authenticated" });
       }
-      
+
       const appointmentId = parseInt(req.params.id);
       const appointment = await storage.getAppointmentById(appointmentId);
 
@@ -345,9 +373,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         if (!req.user || !req.user.uid) {
-          return res.status(401).json({ message: "Unauthorized - User not authenticated" });
+          return res
+            .status(401)
+            .json({ message: "Unauthorized - User not authenticated" });
         }
-        
+
         const appointmentId = parseInt(req.params.id);
         const appointment = await storage.getAppointmentById(appointmentId);
 
@@ -385,25 +415,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch care providers" });
     }
   });
-  
+
   // Get care provider availability
   app.get("/api/care-providers/:id/availability", async (req, res) => {
     try {
       const providerId = parseInt(req.params.id);
-      const startDate = req.query.startDate ? new Date(req.query.startDate as string) : new Date();
-      const endDate = req.query.endDate ? new Date(req.query.endDate as string) : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
-      
+      const startDate = req.query.startDate
+        ? new Date(req.query.startDate as string)
+        : new Date();
+      const endDate = req.query.endDate
+        ? new Date(req.query.endDate as string)
+        : new Date(startDate.getTime() + 7 * 24 * 60 * 60 * 1000);
+
       try {
         // Fetch provider's schedule from the database
-        const availability = await storage.getCareProviderAvailability(providerId, startDate, endDate);
+        const availability = await storage.getCareProviderAvailability(
+          providerId,
+          startDate,
+          endDate
+        );
         res.json(availability);
       } catch (error) {
         console.error("Error getting provider availability:", error);
-        res.status(500).json({ message: "Failed to get provider availability" });
+        res
+          .status(500)
+          .json({ message: "Failed to get provider availability" });
       }
     } catch (error) {
       console.error("Error processing availability request:", error);
-      res.status(500).json({ message: "Failed to process availability request" });
+      res
+        .status(500)
+        .json({ message: "Failed to process availability request" });
     }
   });
 
@@ -567,25 +609,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       // Create simplified application instead - mapping to job application format
-      const simplifiedData = {
-        firstName: req.body.personalDetails?.forename || "",
-        lastName: req.body.personalDetails?.surname || "",
+      const simplifiedData: InsertJobApplication = {
+        fullName: `${req.body.personalDetails?.forename || ""} ${
+          req.body.personalDetails?.surname || ""
+        }`.trim(),
         email: req.body.personalDetails?.email || "",
         phone: req.body.personalDetails?.mobile || "",
         address: req.body.personalDetails?.address || "",
         postcode: req.body.personalDetails?.postcode || "",
-        position: "care-worker", // Default position
-        experience: "3-5", // Default experience
-        availability: "full-time", // Default availability
-        driverLicense:
+        position: req.body.furtherInformation?.position || "Care Worker",
+        experience: req.body.furtherInformation?.experience || "3-5",
+        availability: req.body.furtherInformation?.availability || "full-time",
+        driversLicense:
           req.body.furtherInformation?.drivingLicense === "yes" ? "yes" : "no",
-        rightToWork: "yes", // Default right to work
-        referencePermission: "yes", // Default reference permission
-        message: req.body.supportingStatement || "",
-        resume: "", // No resume in this form
-        coverLetter: "", // No cover letter in this form
-        hearAboutUs: "website", // Default source
+        rightToWork:
+          req.body.furtherInformation?.rightToWork === "yes" ? "yes" : "no",
+        coverLetter: req.body.supportingStatement || "",
+        cvFileName: req.body.cvFileName || undefined,
+        referenceContact: req.body.referenceContact === true,
         dataConsent: req.body.termsAndConditions === true,
+        status: "new",
       };
 
       // Store as a regular job application
@@ -595,7 +638,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       console.log(`
         New detailed application form submission (converted to job application):
         ID: ${jobApplication.id}
-        Name: ${simplifiedData.firstName} ${simplifiedData.lastName}
+        Name: ${simplifiedData.fullName}
         Email: ${simplifiedData.email}
         Submitted: ${new Date().toISOString()}
       `);
@@ -620,13 +663,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (!req.user || !req.user.uid) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      
+
       const userId = req.user.uid;
       console.log("Getting care journey for user:", userId);
-      
+
       // Get the user's care journey
       const journey = await storage.getCareJourney(userId);
-      
+
       if (journey) {
         console.log("Found existing care journey");
         res.json(journey);
@@ -641,40 +684,48 @@ export async function registerRoutes(app: Express): Promise<Server> {
             {
               type: "appointment",
               title: "Initial Consultation",
-              description: "Your first meeting with our care team to discuss your needs.",
+              description:
+                "Your first meeting with our care team to discuss your needs.",
               date: new Date().toISOString(),
               completed: true,
               icon: "appointment",
-              celebration: true
+              celebration: true,
             },
             {
               type: "assessment",
               title: "Care Assessment",
-              description: "Comprehensive evaluation of your care requirements.",
-              date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+              description:
+                "Comprehensive evaluation of your care requirements.",
+              date: new Date(
+                Date.now() + 7 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               completed: false,
-              icon: "assessment"
+              icon: "assessment",
             },
             {
               type: "goal",
               title: "Care Plan Creation",
               description: "Development of your personalized care plan.",
-              date: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
+              date: new Date(
+                Date.now() + 14 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               completed: false,
-              icon: "goal"
+              icon: "goal",
             },
             {
               type: "achievement",
               title: "First Month Milestone",
               description: "Celebrating one month of successful care service.",
-              date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+              date: new Date(
+                Date.now() + 30 * 24 * 60 * 60 * 1000
+              ).toISOString(),
               completed: false,
               icon: "achievement",
-              celebration: true
-            }
-          ]
+              celebration: true,
+            },
+          ],
         };
-        
+
         // Save the default journey
         try {
           const newJourney = await storage.createCareJourney(defaultJourney);
@@ -687,44 +738,53 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       console.error("Error handling care journey request:", error);
-      res.status(500).json({ message: "Failed to process care journey request" });
+      res
+        .status(500)
+        .json({ message: "Failed to process care journey request" });
     }
   });
-  
+
   // Update a milestone in the care journey
-  app.patch("/api/care-journey/milestones/:id", isAuthenticated, async (req, res) => {
-    try {
-      if (!req.user || !req.user.uid) {
-        return res.status(401).json({ message: "Unauthorized" });
+  app.patch(
+    "/api/care-journey/milestones/:id",
+    isAuthenticated,
+    async (req, res) => {
+      try {
+        if (!req.user || !req.user.uid) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const userId = req.user.uid;
+        const milestoneId = parseInt(req.params.id);
+
+        console.log(`Updating milestone ${milestoneId} for user ${userId}`);
+
+        // Get the user's care journey
+        const journey = await storage.getCareJourney(userId);
+
+        if (!journey) {
+          return res.status(404).json({ message: "Care journey not found" });
+        }
+
+        // Update the milestone
+        const result = await storage.updateCareJourneyMilestone(
+          milestoneId,
+          req.body
+        );
+
+        if (result) {
+          // Fetch the updated journey to return the complete data
+          const updatedJourney = await storage.getCareJourney(userId);
+          res.json(updatedJourney);
+        } else {
+          res.status(404).json({ message: "Milestone not found" });
+        }
+      } catch (error) {
+        console.error("Error updating milestone:", error);
+        res.status(500).json({ message: "Failed to update milestone" });
       }
-      
-      const userId = req.user.uid;
-      const milestoneId = parseInt(req.params.id);
-      
-      console.log(`Updating milestone ${milestoneId} for user ${userId}`);
-      
-      // Get the user's care journey
-      const journey = await storage.getCareJourney(userId);
-      
-      if (!journey) {
-        return res.status(404).json({ message: "Care journey not found" });
-      }
-      
-      // Update the milestone
-      const result = await storage.updateCareJourneyMilestone(milestoneId, req.body);
-      
-      if (result) {
-        // Fetch the updated journey to return the complete data
-        const updatedJourney = await storage.getCareJourney(userId);
-        res.json(updatedJourney);
-      } else {
-        res.status(404).json({ message: "Milestone not found" });
-      }
-    } catch (error) {
-      console.error("Error updating milestone:", error);
-      res.status(500).json({ message: "Failed to update milestone" });
     }
-  });
+  );
 
   const httpServer = createServer(app);
   return httpServer;
